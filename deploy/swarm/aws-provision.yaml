@@ -1,0 +1,47 @@
+---
+
+# AWS token should be exported beforehand
+# export AWS_ACCESS_KEY_ID='AK123'
+# export AWS_SECRET_ACCESS_KEY='abc123'
+
+# From http://docs.ansible.com/ansible/guide_aws.html
+# Provisioning - The ec2 module provisions and de-provisions instances within EC2.
+# The “exact_count” of instances is set to 5. This means if there are 0 instances already existing, then 5 new instances would be created. If there were 2 instances, only 3 would be created, and if there were 8 instances, 3 instances would be terminated.
+# What is being counted is specified by the “count_tag” parameter
+
+- hosts: 127.0.0.1
+  connection: local
+  gather_facts: False
+
+  tasks:
+
+    - name: Provision 5 debian 8.4 t2.small instances @us-west-2
+      ec2:
+         group: zscaler-test
+         instance_type: t2.small
+         image: ami-98e114f8 # see https://wiki.debian.org/Cloud/AmazonEC2Image/Jessie
+         wait: true
+         exact_count: 5
+         region: us-west-2
+         count_tag:
+            Name: Swarm
+         instance_tags:
+            Name: Swarm
+      register: ec2
+
+    - name: Add all instance public IPs to swarm host group
+      add_host: name={{ item.public_ip }} groups=swarm ansible_user=root
+      with_items: "{{ ec2.instances }}"
+
+    - name: Debug
+      debug:
+         var: hostvars
+
+- name: Configuring instances...
+  hosts: swarm
+  gather_facts: true
+
+  tasks:
+
+    - name: Install docker # see https://docs.docker.com/v1.8/installation/debian/
+      apt: name=docker.io update_cache=yes

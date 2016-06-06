@@ -6,42 +6,165 @@
 
 # From http://docs.ansible.com/ansible/guide_aws.html
 # Provisioning - The ec2 module provisions and de-provisions instances within EC2.
-# The “exact_count” of instances is set to 5. This means if there are 0 instances already existing, then 5 new instances would be created. If there were 2 instances, only 3 would be created, and if there were 8 instances, 3 instances would be terminated.
-# What is being counted is specified by the “count_tag” parameter
+# The “exact_count” of instances is set to 5. This means if there are 0 instances already existing, then 5 new instances would be created. If there were 2 instances, only 3 would be created, and if there were 8 instances, 3 instances would be terminated. What is being counted is specified by the “count_tag” parameter
 
-- hosts: 127.0.0.1
+- name: Provision 5 debian 8.4 t2.small instances @us-west-2
+  hosts: 127.0.0.1
   connection: local
+  gather_facts: false
+
+  tasks:
+
+    - name: Provision managers instances
+      ec2:
+        group: zscaler-test
+        instance_type: t2.small
+        image: ami-98e114f8 # see https://wiki.debian.org/Cloud/AmazonEC2Image/Jessie
+        wait: true
+        exact_count: 2
+        region: us-west-2
+        key_name: mricher
+        count_tag:
+           Name: swarm-manager
+        instance_tags:
+           Name: swarm-manager
+      register: ec2
+
+    - name: Add instance public IPs to swarm host group
+      add_host: name={{ item.public_ip }} groups=swarm,swarm_manager
+      with_items: "{{ ec2.tagged_instances }}"
+
+    - name: Provision nodes instances
+      ec2:
+        group: zscaler-test
+        instance_type: t2.small
+        image: ami-98e114f8 # see https://wiki.debian.org/Cloud/AmazonEC2Image/Jessie
+        wait: true
+        exact_count: 2
+        region: us-west-2
+        key_name: mricher
+        count_tag:
+           Name: swarm-node
+        instance_tags:
+           Name: swarm-node
+      register: ec2
+
+    - name: Add instance public IPs to swarm host group
+      add_host: name={{ item.public_ip }} groups=swarm,swarm_node
+      with_items: "{{ ec2.tagged_instances }}"
+
+  #   - name: Dump inventory
+  #   debug:
+  #     var: hostvars[inventory_hostname]
+
+- name: Global instances configuration
+  hosts: swarm
+  remote_user: admin
+  gather_facts: false
+  become: True
+  become_method: sudo
+
+  tasks:
+    #- name: Wait for SSH to come up
+    #wait_for: port=22 delay=120 timeout=320 state=started
+
+    - name: Add docker apt key
+      apt_key: keyserver=hkp://p80.pool.sks-keyservers.net:80 id=58118E89F3A912897C070ADBF76221572C52609D
+
+    - name: Add docker repo
+      apt_repository: repo='deb https://apt.dockerproject.org/repo debian-jessie main' state=present
+
+    - name: Install docker
+      apt: name=docker-engine update_cache=yes
+
+    - name: Install pip
+      easy_install: name=pip state=latest
+
+    - name: Install docker wrapper
+      apt: name=python-docker update_cache=yes
+    
+    - name: Install docker python API
+      pip: name=docker-py state=latest
+
+    - name: Add user to docker group
+      command: usermod -aG docker admin
+
+- name: Setup discovery backend
+  hosts: swarm_manager
+  remote_user: admin
+  gather_facts: false
+  become: True
+
+  tasks:
+    - name: Start consul container on managers
+      # docker run -d -p 8500:8500 --name=consul progrium/consul -server -bootstrap
+      docker_container:
+        name: consul
+        image: progrium/consul
+        ports:
+          - "8500:8500"
+        state: started
+        detach: True
+        command: -server -bootstrap
+
+- name: Setup primary cluster manager
+  hosts: swarm_manager[0]
+  remote_user: admin
+  gather_facts: False
+  become: True
+  become_method: sudo
+
+  tasks:
+    - name: Debug
+      debug:
+        var: groups['swarm_manager'][0]
+
+    - name: Start swarm cluster managers
+      docker_container:
+        name: swarm
+        image: swarm
+        ports:
+          - "4000:4000"
+        state: started
+        detach: True
+        command: manage -H :4000 >
+            --replication >
+            --advertise {{ groups['swarm_manager'][0] }}:4000 > 
+            consul://{{ groups['swarm_manager'][0] }}:8500
+
+- name: Setup secondary cluster manager
+  hosts: swarm_manager[1:]
+  remote_user: admin
   gather_facts: False
 
   tasks:
+    - name: Start swarm cluster managers (replica)
+      # docker run -d -p 4000:4000 swarm manage -H :4000 --replication --advertise <manager1_ip>:4000 consul://172.30.0.161:8500
+      docker_container:
+        name: swarm
+        image: swarm
+        ports:
+          - "4000:4000"
+        state: started
+        detach: True
+        command: manage -H :4000 >
+            --replication >
+            --advertise {{ inventory_hostname }}:4000 consul://{{ groups['swarm_manager'][0] }}:8500
 
-    - name: Provision 5 debian 8.4 t2.small instances @us-west-2
-      ec2:
-         group: zscaler-test
-         instance_type: t2.small
-         image: ami-98e114f8 # see https://wiki.debian.org/Cloud/AmazonEC2Image/Jessie
-         wait: true
-         exact_count: 5
-         region: us-west-2
-         count_tag:
-            Name: Swarm
-         instance_tags:
-            Name: Swarm
-      register: ec2
-
-    - name: Add all instance public IPs to swarm host group
-      add_host: name={{ item.public_ip }} groups=swarm ansible_user=root
-      with_items: "{{ ec2.instances }}"
-
-    - name: Debug
-      debug:
-         var: hostvars
-
-- name: Configuring instances...
-  hosts: swarm
-  gather_facts: true
+- name: Setup nodes
+  hosts: swarm_node
+  remote_user: admin
+  gather_facts: False
 
   tasks:
+    - name: Nodes joins cluster
+      # docker run -d swarm join --advertise=<node_ip>:2375 consul://<consul_ip>:8500
+      docker_container:
+        name: swarm
+        image: swarm
+        state: started
+        detach: True
+        command: join >
+            --advertise {{ inventory_hostname }}:2375 consul://{{ groups['swarm_manager'][0] }}:8500
 
-    - name: Install docker # see https://docs.docker.com/v1.8/installation/debian/
-      apt: name=docker.io update_cache=yes
+

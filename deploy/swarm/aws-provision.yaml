@@ -86,9 +86,6 @@
     - name: Install docker python API
       pip: name=docker-py state=latest
 
-    - name: Add user to docker group
-      command: usermod -aG docker admin
-
 - name: Setup discovery backend
   hosts: swarm_manager
   remote_user: admin
@@ -127,15 +124,21 @@
           - "4000:4000"
         state: started
         detach: True
-        command: manage -H :4000 >
-            --replication >
-            --advertise {{ groups['swarm_manager'][0] }}:4000 > 
-            consul://{{ groups['swarm_manager'][0] }}:8500
+        command: 
+          - "manage"
+          - "-H" 
+          - ":4000" 
+          - "--replication"
+          - "--advertise" 
+          - "{{ groups['swarm_manager'][0] }}:4000" 
+          - "consul://{{ groups['swarm_manager'][0] }}:8500"
 
 - name: Setup secondary cluster manager
   hosts: swarm_manager[1:]
   remote_user: admin
   gather_facts: False
+  become: True
+  become_method: sudo
 
   tasks:
     - name: Start swarm cluster managers (replica)
@@ -147,14 +150,21 @@
           - "4000:4000"
         state: started
         detach: True
-        command: manage -H :4000 >
-            --replication >
-            --advertise {{ inventory_hostname }}:4000 consul://{{ groups['swarm_manager'][0] }}:8500
+        command: 
+          - "manage"
+          - "-H" 
+          - ":4000" 
+          - "--replication"
+          - "--advertise" 
+          - "{{ inventory_hostname }}:4000" 
+          - "consul://{{ groups['swarm_manager'][0] }}:8500"
 
 - name: Setup nodes
   hosts: swarm_node
   remote_user: admin
   gather_facts: False
+  become: True
+  become_method: sudo
 
   tasks:
     - name: Nodes joins cluster
@@ -164,7 +174,10 @@
         image: swarm
         state: started
         detach: True
-        command: join >
-            --advertise {{ inventory_hostname }}:2375 consul://{{ groups['swarm_manager'][0] }}:8500
+        command: 
+           - "join"
+           - "--advertise"
+           - "{{ inventory_hostname }}:2375" 
+           - "consul://{{ groups['swarm_manager'][0] }}:8500"
 
 

@@ -5,8 +5,6 @@
 # export AWS_SECRET_ACCESS_KEY='abc123'
 
 # From http://docs.ansible.com/ansible/guide_aws.html
-# Provisioning - The ec2 module provisions and de-provisions instances within EC2.
-# The “exact_count” of instances is set to 5. This means if there are 0 instances already existing, then 5 new instances would be created. If there were 2 instances, only 3 would be created, and if there were 8 instances, 3 instances would be terminated. What is being counted is specified by the “count_tag” parameter
 
 - name: Provision 5 debian 8.4 t2.small instances @us-west-2
   hosts: 127.0.0.1
@@ -65,8 +63,11 @@
   become_method: sudo
 
   tasks:
-    #- name: Wait for SSH to come up
-    #wait_for: port=22 delay=120 timeout=320 state=started
+    - name: Wait 30s for DNS resolution
+      pause: seconds=30
+
+    - name: Wait for SSH to come up
+      wait_for: port=22 delay=30 timeout=180 state=started
 
     - name: Add docker apt key
       apt_key: keyserver=hkp://p80.pool.sks-keyservers.net:80 id=58118E89F3A912897C070ADBF76221572C52609D
@@ -117,9 +118,12 @@
         var: groups['swarm_manager'][0]
 
     - name: Start swarm cluster managers
+      # see http://docs.ansible.com/ansible/docker_container_module.html
       docker_container:
         name: swarm
         image: swarm
+        exposed:
+          - "4000"
         ports:
           - "4000:4000"
         state: started
@@ -146,6 +150,8 @@
       docker_container:
         name: swarm
         image: swarm
+        exposed:
+          - "4000"
         ports:
           - "4000:4000"
         state: started
@@ -167,12 +173,27 @@
   become_method: sudo
 
   tasks:
-    - name: Nodes joins cluster
+    - name: Check systemd Docker configuration file
+      file: state=directory path=/etc/systemd/system/docker.service.d
+
+    - name: Create systemd docker config file socket.conf
+      copy:
+        content: "[Service]\nExecStart=\nExecStart=/usr/bin/docker daemon -H fd:// -H tcp://0.0.0.0:2375\n"
+        dest: /etc/systemd/system/docker.service.d/socket.conf
+
+    - name: Reload systemctl
+      command: "systemctl daemon-reload"
+
+    - name: Restart Docker service 
+      service: name=docker state=restarted
+
+    - name: Nodes join cluster
       # docker run -d swarm join --advertise=<node_ip>:2375 consul://<consul_ip>:8500
       docker_container:
         name: swarm
         image: swarm
         state: started
+        ports:
         detach: True
         command: 
            - "join"

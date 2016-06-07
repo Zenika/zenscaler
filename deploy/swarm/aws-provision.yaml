@@ -51,10 +51,6 @@
       add_host: name={{ item.public_ip }} groups=swarm,swarm_node
       with_items: "{{ ec2.tagged_instances }}"
 
-  #   - name: Dump inventory
-  #   debug:
-  #     var: hostvars[inventory_hostname]
-
 - name: Global instances configuration
   hosts: swarm
   remote_user: admin
@@ -113,10 +109,6 @@
   become_method: sudo
 
   tasks:
-    - name: Debug
-      debug:
-        var: groups['swarm_manager'][0]
-
     - name: Start swarm cluster managers
       # see http://docs.ansible.com/ansible/docker_container_module.html
       docker_container:
@@ -200,5 +192,4 @@
            - "--advertise"
            - "{{ inventory_hostname }}:2375" 
            - "consul://{{ groups['swarm_manager'][0] }}:8500"
-
 

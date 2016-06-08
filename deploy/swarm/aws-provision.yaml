@@ -6,7 +6,7 @@
 
 # From http://docs.ansible.com/ansible/guide_aws.html
 
-- name: Provision 5 debian 8.4 t2.small instances @us-west-2
+- name: Provision 4 debian 8.4 t2.small instances @us-west-2
   hosts: 127.0.0.1
   connection: local
   gather_facts: false
@@ -59,8 +59,8 @@
   become_method: sudo
 
   tasks:
-    - name: Wait 30s for DNS resolution
-      pause: seconds=30
+    - name: Wait 80s for DNS resolution
+      pause: seconds=80
 
     - name: Wait for SSH to come up
       wait_for: port=22 delay=30 timeout=180 state=started

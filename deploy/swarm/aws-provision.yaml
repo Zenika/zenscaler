@@ -170,7 +170,8 @@
 
     - name: Create systemd docker config file socket.conf
       copy:
-        content: "[Service]\nExecStart=\nExecStart=/usr/bin/docker daemon -H fd:// -H tcp://0.0.0.0:2375\n"
+        # TODO replace this using a template
+        content: "[Service]\nExecStart=\nExecStart=/usr/bin/docker daemon -H fd:// -H tcp://0.0.0.0:2375 --cluster-store consul://{{ groups['swarm_manager'][0]  }}:8500 --cluster-advertise {{ inventory_hostname }}:2375\n"
         dest: /etc/systemd/system/docker.service.d/socket.conf
 
     - name: Reload systemctl

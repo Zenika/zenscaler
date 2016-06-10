@@ -31,7 +31,7 @@
       register: ec2
 
     - name: Add instance public IPs to core host group
-      add_host: name={{ item.public_ip }} groups=core ansible_python_interpreter="/home/core/python"
+      add_host: name={{ item.public_ip }} groups=core ansible_python_interpreter="/home/core/bin/python"
       with_items: "{{ ec2.tagged_instances }}"
 
     - name: Wait 80s for DNS resolution
@@ -72,7 +72,7 @@
 
 # See https://coreos.com/kubernetes/docs/latest/openssl.html
 - name: Setup openssl files
-  hosts: localhost
+  hosts: 127.0.0.1
 
   tasks:
     - name: Create CA key (ensure that openssl is installed!)
@@ -88,17 +88,18 @@
 
 - name: Setup workers
   hosts: core[1:]
+  remote_user: core
 
   tasks:
     - name: Create key
-      local_action: command "openssl genrsa -out {{ inventory_hostname  }}-worker-key.pem 2048"
+      local_action: shell openssl genrsa -out {{ inventory_hostname  }}-worker-key.pem 2048
     - name: Certificate request
-      local_action: command "WORKER_IP={{ inventory_hostname }} openssl req -new -key {{ inventory_hostname }}-worker-key.pem -out {{ inventory_hostname }}-worker.csr -subj \"/CN={{ inventory_hostname }}\" -config worker-openssl.cnf"
+      local_action: shell WORKER_IP={{ inventory_hostname }} openssl req -new -key {{ inventory_hostname }}-worker-key.pem -out {{ inventory_hostname }}-worker.csr -subj "/CN={{ inventory_hostname }}" -config worker-openssl.cnf
     - name: Craft certificate
-      local_action: command "WORKER_IP={{ inventory_hostname }} openssl x509 -req -in {{ inventory_hostname }}-worker.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out {{ inventory_hostname }}-worker.pem -days 365 -extensions v3_req -extfile worker-openssl.cnf"
+      local_action: shell WORKER_IP={{ inventory_hostname }} openssl x509 -req -in {{ inventory_hostname }}-worker.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out {{ inventory_hostname }}-worker.pem -days 365 -extensions v3_req -extfile worker-openssl.cnf
 
 - name: Setup local access
-  hosts: localhost
+  hosts: 127.0.0.1
 
   tasks:
     - command: 'openssl genrsa -out admin-key.pem 2048'

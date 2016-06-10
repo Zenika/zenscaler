@@ -59,9 +59,9 @@
     - name: Create etcd2 configuration file
       copy:
         # TODO replace this using a template
-        content: "[Service]
-        Environment=ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
-        Environment=ETCD_ADVERTISE_CLIENT_URLS=http://{{ inventory_hostname }}:2379"
+        content: "[Service]\n
+        Environment=ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379\n
+        Environment=ETCD_ADVERTISE_CLIENT_URLS=http://{{ inventory_hostname }}:2379\n"
         dest: /etc/systemd/system/etcd2.service.d/40-listen-address.conf
 
     - name: Reload systemctl
@@ -83,8 +83,21 @@
       command: 'openssl genrsa -out apiserver-key.pem 2048'
     - name: Create api-master certificate request
       command: 'openssl req -new -key apiserver-key.pem -out apiserver.csr -subj "/CN=kube-apiserver" -config openssl.cnf'
+    # TODO remove master ip from configuration file
     - name: Create api-master certificate
       command: 'openssl x509 -req -in apiserver.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out apiserver.pem -days 365 -extensions v3_req -extfile openssl.cnf'
+
+- name: Configure master node
+  hosts: core[0]
+  remote_user: core
+  become: True
+  become_method: sudo
+  
+  tasks:
+    - file: state=directory path=/etc/kubernetes/ssl
+    - copy: src=ca.pem dest=/etc/kubernetes/ssl
+    - copy: src=apiserver.pem dest=/etc/kubernetes/ssl
+    - copy: src=apiserver-key.pem dest=/etc/kubernetes/ssl mode=0600
 
 - name: Setup workers
   hosts: core[1:]

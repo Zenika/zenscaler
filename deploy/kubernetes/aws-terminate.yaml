@@ -1,0 +1,21 @@
+# AWS token should be exported beforehand
+# export AWS_ACCESS_KEY_ID='AK123'
+# export AWS_SECRET_ACCESS_KEY='abc123'
+
+# From http://docs.ansible.com/ansible/guide_aws.html
+# run with ansible-playbook -i ec2.py aws-terminate.yaml
+- name: Terminate all zscaler instances
+  hosts: security_group_zscaler_test
+  gather_facts: false
+  vars:
+    - region: 'us-west-2'
+
+  tasks:
+
+    - name: Terminate instances
+      local_action: ec2
+          state='absent'
+          instance_ids="{{ ec2_id }}"
+          region="{{ region }}"
+          wait=True
+

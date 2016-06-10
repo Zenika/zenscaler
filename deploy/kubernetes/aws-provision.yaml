@@ -1,0 +1,106 @@
+---
+
+# AWS token should be exported beforehand
+# export AWS_ACCESS_KEY_ID='AK123'
+# export AWS_SECRET_ACCESS_KEY='abc123'
+
+# From http://docs.ansible.com/ansible/guide_aws.html
+# See also https://coreos.com/kubernetes/docs/latest/getting-started.html
+#
+
+- name: Provision 4 coreOS t2.small instances @us-west-2
+  hosts: 127.0.0.1
+  connection: local
+  gather_facts: false
+
+  tasks:
+
+    - name: Provision instances
+      ec2:
+        group: zscaler-test
+        instance_type: t2.small
+        image: ami-32a85152 # https://coreos.com/os/docs/latest/booting-on-ec2.html 
+        wait: true
+        exact_count: 2
+        region: us-west-2
+        key_name: mricher
+        count_tag:
+           Name: core
+        instance_tags:
+           Name: core
+      register: ec2
+
+    - name: Add instance public IPs to core host group
+      add_host: name={{ item.public_ip }} groups=core ansible_python_interpreter="/home/core/python"
+      with_items: "{{ ec2.tagged_instances }}"
+
+    - name: Wait 80s for DNS resolution
+      pause: seconds=80
+
+- name: Global instances configuration
+  hosts: core
+  remote_user: core
+  gather_facts: false
+
+  roles:
+    - defunctzombie.coreos-bootstrap
+
+- name: Setup master
+  hosts: core[0]
+  remote_user: core
+  gather_facts: false
+  become: True
+  become_method: sudo
+
+  tasks:
+    - name: Check etcd2 directory
+      file: state=directory path=/etc/systemd/system/etcd2.service.d/
+
+    - name: Create etcd2 configuration file
+      copy:
+        # TODO replace this using a template
+        content: "[Service]
+        Environment=ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
+        Environment=ETCD_ADVERTISE_CLIENT_URLS=http://{{ inventory_hostname }}:2379"
+        dest: /etc/systemd/system/etcd2.service.d/40-listen-address.conf
+
+    - name: Reload systemctl
+      command: "systemctl daemon-reload"
+
+    - name: Restart Docker service 
+      service: name=etcd2 state=restarted
+
+# See https://coreos.com/kubernetes/docs/latest/openssl.html
+- name: Setup openssl files
+  hosts: localhost
+
+  tasks:
+    - name: Create CA key (ensure that openssl is installed!)
+      command: 'openssl genrsa -out ca-key.pem 2048'
+    - name: Create CA 
+      command: 'openssl req -x509 -new -nodes -key ca-key.pem -days 10000 -out ca.pem -subj "/CN=kube-ca"'
+    - name: Create api-master key
+      command: 'openssl genrsa -out apiserver-key.pem 2048'
+    - name: Create api-master certificate request
+      command: 'openssl req -new -key apiserver-key.pem -out apiserver.csr -subj "/CN=kube-apiserver" -config openssl.cnf'
+    - name: Create api-master certificate
+      command: 'openssl x509 -req -in apiserver.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out apiserver.pem -days 365 -extensions v3_req -extfile openssl.cnf'
+
+- name: Setup workers
+  hosts: core[1:]
+
+  tasks:
+    - name: Create key
+      local_action: command "openssl genrsa -out {{ inventory_hostname  }}-worker-key.pem 2048"
+    - name: Certificate request
+      local_action: command "WORKER_IP={{ inventory_hostname }} openssl req -new -key {{ inventory_hostname }}-worker-key.pem -out {{ inventory_hostname }}-worker.csr -subj \"/CN={{ inventory_hostname }}\" -config worker-openssl.cnf"
+    - name: Craft certificate
+      local_action: command "WORKER_IP={{ inventory_hostname }} openssl x509 -req -in {{ inventory_hostname }}-worker.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out {{ inventory_hostname }}-worker.pem -days 365 -extensions v3_req -extfile worker-openssl.cnf"
+
+- name: Setup local access
+  hosts: localhost
+
+  tasks:
+    - command: 'openssl genrsa -out admin-key.pem 2048'
+    - command: 'openssl req -new -key admin-key.pem -out admin.csr -subj "/CN=kube-admin"'
+    - command: 'openssl x509 -req -in admin.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out admin.pem -days 365'

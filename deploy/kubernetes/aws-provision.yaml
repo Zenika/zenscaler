@@ -92,7 +92,7 @@
   remote_user: core
   become: True
   become_method: sudo
-  
+  # See https://coreos.com/kubernetes/docs/latest/deploy-master.html
   tasks:
     # Manage TLS files
     - file: state=directory path=/etc/kubernetes/ssl
@@ -101,24 +101,28 @@
     - copy: src=apiserver-key.pem dest=/etc/kubernetes/ssl mode=0600
     # Setup flannel
     - name: Setup flannel on master node
-      copy:
+      file: state=directory path=/etc/flannel
+    - copy:
         # TODO replace this using a template
         content: "FLANNELD_IFACE={{ inventory_hostname }}\nFLANNELD_ETCD_ENDPOINTS={{ inventory_hostname }}"
         dest: "/etc/flannel/options.env"
     - name: Systemd drop-in for flannel
-      copy:
+      file: state=directory path=/etc/systemd/system/flanneld.service.d
+    - copy:
         # TODO replace this using a template
         content: "[Service]\nExecStartPre=/usr/bin/ln -sf /etc/flannel/options.env /run/flannel/options.env"
         dest: "/etc/systemd/system/flanneld.service.d/40-ExecStartPre-symlink.conf"
     - name: Flannel start before docker
-      copy:
+      file: state=directory path=/etc/systemd/system/docker.service.d
+    - copy:
         # TODO replace this using a template
         content: "[Unit]\nRequires=flanneld.service\nAfter=flanneld.service"
         dest: "/etc/systemd/system/docker.service.d/40-flannel.conf"
     - name: Create the kubelet unit
       template: src=templates/kubelet.service.j2 dest=/etc/systemd/system/kubelet.service
     - name: Configure API endpoint
-      template: src=/templates/kube-apiserver.yml.j2 dest=/etc/kubernetes/manifests/kube-apiserver.yaml
+      file: state=directory path=/etc/kubernetes/manifests
+    - template: src=templates/kube-apiserver.yml.j2 dest=/etc/kubernetes/manifests/kube-apiserver.yaml
     - name: Set Up the kube-proxy Pod
       copy: src=templates/kube-proxy.yaml dest=/etc/kubernetes/manifests/kube-proxy.yaml
     - name: Set Up the kube-controller-manager Pod

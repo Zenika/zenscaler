@@ -132,6 +132,36 @@
     # Set Up Calico Node Container (optional)
     # Set Up the policy-agent Pod (optional)
     # Set Up the CNI config (optional)
+    - name: Start Services (daemon reload)
+      command: systemctl daemon-reload
+    - name: Configure flannel Network
+      uri:
+        url: http://localhost:2379/v2/keys/coreos.com/network/config
+        method: PUT
+        body: "value={\"Network\":\"$POD_NETWORK\",\"Backend\":{\"Type\":\"vxlan\"}}"
+        status_code: 201, 200
+        # body_format: json
+        # HEADER_Content-Type: "application/json" 
+    - name: Start kubelet
+      service: name=kubelet state=restarted enabled=yes
+    # Start Calico (optional)
+    - name: Wait for kubelet API
+      wait_for: host=localhost port=8080
+    # Note: If deploying multiple master nodes, this step needs to happen only once.
+    - name: Create Namespaces for kubelet
+      uri:
+        url: http://127.0.0.1:2379/api/v1/namespaces
+        method: POST
+        body: '{"apiVersion":"v1","kind":"Namespace","metadata":{"name":"kube-system"}}'
+        status_code: 201, 200
+        HEADER_Content-Type: "application/json"
+    - name: Create Namespaces for calico
+      uri:
+        url: http://127.0.0.1:2379/api/v1/namespaces
+        method: POST
+        body: '{"apiVersion":"v1","kind":"Namespace","metadata":{"name":"calico-system"}}'
+        status_code: 201, 200
+        HEADER_Content-Type: "application/json"
 
 - name: Setup workers
   hosts: core[1:]

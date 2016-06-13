@@ -94,10 +94,22 @@
   become_method: sudo
   
   tasks:
+    # Manage TLS files
     - file: state=directory path=/etc/kubernetes/ssl
     - copy: src=ca.pem dest=/etc/kubernetes/ssl
     - copy: src=apiserver.pem dest=/etc/kubernetes/ssl
     - copy: src=apiserver-key.pem dest=/etc/kubernetes/ssl mode=0600
+    # Setup flannel
+    - name: Setup flannel on master node
+      copy:
+        # TODO replace this using a template
+        content: "FLANNELD_IFACE={{ inventory_hostname }}\nFLANNELD_ETCD_ENDPOINTS={{ inventory_hostname }}"
+        dest: "/etc/flannel/options.env"
+    - name: Systemd drop-in for flannel
+      copy:
+        # TODO replace this using a template
+        content: "[Service]\nExecStartPre=/usr/bin/ln -sf /etc/flannel/options.env /run/flannel/options.env"
+        dest: "/etc/systemd/system/flanneld.service.d/40-ExecStartPre-symlink.conf"
 
 - name: Setup workers
   hosts: core[1:]

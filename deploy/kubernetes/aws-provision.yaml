@@ -110,6 +110,24 @@
         # TODO replace this using a template
         content: "[Service]\nExecStartPre=/usr/bin/ln -sf /etc/flannel/options.env /run/flannel/options.env"
         dest: "/etc/systemd/system/flanneld.service.d/40-ExecStartPre-symlink.conf"
+    - name: Flannel start before docker
+      copy:
+        # TODO replace this using a template
+        content: "[Unit]\nRequires=flanneld.service\nAfter=flanneld.service"
+        dest: "/etc/systemd/system/docker.service.d/40-flannel.conf"
+    - name: Create the kubelet unit
+      template: src=templates/kubelet.service.j2 dest=/etc/systemd/system/kubelet.service
+    - name: Configure API endpoint
+      template: src=/templates/kube-apiserver.yml.j2 dest=/etc/kubernetes/manifests/kube-apiserver.yaml
+    - name: Set Up the kube-proxy Pod
+      copy: src=templates/kube-proxy.yaml dest=/etc/kubernetes/manifests/kube-proxy.yaml
+    - name: Set Up the kube-controller-manager Pod
+      copy: src=templates/kube-controller-manager.yaml dest=/etc/kubernetes/manifests/kube-controller-manager.yaml
+    - name: Set Up the kube-scheduler Pod
+      copy: src=templates/kube-scheduler.yaml dest=/etc/kubernetes/manifests/kube-scheduler.yaml
+    # Set Up Calico Node Container (optional)
+    # Set Up the policy-agent Pod (optional)
+    # Set Up the CNI config (optional)
 
 - name: Setup workers
   hosts: core[1:]

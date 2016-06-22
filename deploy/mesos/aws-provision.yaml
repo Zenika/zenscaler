@@ -1,0 +1,185 @@
+---
+
+# AWS token should be exported beforehand
+# export AWS_ACCESS_KEY_ID='AK123'
+# export AWS_SECRET_ACCESS_KEY='abc123'
+
+# From http://docs.ansible.com/ansible/guide_aws.html
+
+- name: Provision debian 8.4 t2.small instances @us-west-2
+  hosts: 127.0.0.1
+  connection: local
+  gather_facts: false
+
+  tasks:
+
+    - name: Provision managers instances
+      ec2:
+        group: zscaler-test
+        instance_type: t2.small
+        image: ami-98e114f8 # see https://wiki.debian.org/Cloud/AmazonEC2Image/Jessie
+        wait: true
+        exact_count: 3
+        region: us-west-2
+        key_name: mricher
+        count_tag:
+           Name: mesos-manager
+        instance_tags:
+           Name: mesos-manager
+      register: ec2
+
+    - name: Add instance public IPs to swarm host group
+      add_host: name={{ item.public_ip }} groups=mesos,mesos_manager
+      with_items: "{{ ec2.tagged_instances }}"
+
+    - name: Provision nodes instances
+      ec2:
+        group: zscaler-test
+        instance_type: t2.medium
+        image: ami-98e114f8 # see https://wiki.debian.org/Cloud/AmazonEC2Image/Jessie
+        wait: true
+        exact_count: 4
+        region: us-west-2
+        key_name: mricher
+        count_tag:
+           Name: mesos-node
+        instance_tags:
+           Name: mesos-node
+      register: ec2
+
+    - name: Add instance public IPs to swarm host group
+      add_host: name={{ item.public_ip }} groups=mesos,mesos_node
+      with_items: "{{ ec2.tagged_instances }}"
+
+- name: Global instances configuration
+  hosts: mesos
+  remote_user: admin
+  gather_facts: false
+  become: True
+  become_method: sudo
+
+  tasks:
+    - name: Wait 80s for DNS resolution
+      pause: seconds=80
+
+    - name: Wait for SSH to come up
+      wait_for: port=22 delay=30 timeout=180 state=started
+
+    - name: Add docker apt key
+      apt_key: keyserver=hkp://p80.pool.sks-keyservers.net:80 id=58118E89F3A912897C070ADBF76221572C52609D
+
+    - name: Add docker repo
+      apt_repository: repo='deb https://apt.dockerproject.org/repo debian-jessie main' state=present
+
+    - name: Install docker
+      apt: name=docker-engine update_cache=yes
+
+    - name: Install pip
+      easy_install: name=pip state=latest
+
+    - name: Install docker wrapper
+      apt: name=python-docker update_cache=yes
+    
+    - name: Install docker python API
+      pip: name=docker-py state=latest
+
+    - name: Add mesos apt key
+      apt_key: keyserver=keyserver.ubuntu.com id=0xE56151BF
+
+    - name: Add mesos repository
+      apt_repository: repo='deb http://repos.mesosphere.io/debian jessie main'
+
+    - name: Install mesos
+      apt: name=mesos update_cache=yes
+
+- name: Setup marathon and zookeeper backend
+  hosts: mesos_manager
+  remote_user: admin
+  gather_facts: false
+  become: True
+
+  vars:
+    zk_counter: 1
+  tasks:
+    - name: Install JRE 1.8
+      apt: name=openjdk-8-jdk
+
+    - name: Set default java to 1.8
+      shell: /usr/sbin/update-java-alternatives -s java-1.8.0-openjdk-amd64
+
+    - name: Install marathon
+      apt: name=marathon
+
+    # TODO not pretty but cannot think of something else
+    - name: Configure zookeeper - Set server id 1
+      copy: content="1" dest=/etc/zookeeper/conf/myid
+      when: inventory_hostname == groups['mesos_manager'][0]
+
+    - name: Configure zookeeper - Set server id 2
+      copy: content="2" dest=/etc/zookeeper/conf/myid
+      when: inventory_hostname == groups['mesos_manager'][1]
+
+    - name: Configure zookeeper - Set server id 3
+      copy: content="3" dest=/etc/zookeeper/conf/myid
+      when: inventory_hostname == groups['mesos_manager'][2]
+    
+
+    # Zookeeper quorum MUST BE 3 nodes
+    - name: Server addr config
+      copy:
+         content: "server.1={{ groups['mesos_manager'][0] }}:2888:3888\n
+          server.2={{ groups['mesos_manager'][1] }}:2888:3888\n
+          server.3={{ groups['mesos_manager'][2] }}:2888:3888\n"
+         dest: /etc/zookeeper/conf/zoo.cfg
+
+    - name: Start zookeeper service
+      service: name=zookeeper state=restarted
+
+    - name: Mesos zookeeper configuration
+      copy:
+         content: "zk://{{ groups['mesos_manager'][0] }}:2181,{{ groups['mesos_manager'][1] }}:2181,{{ groups['mesos_manager'][2] }}:2181/mesos"
+         dest: /etc/mesos/zk
+
+    - name: Set quorum size
+      copy:
+         content: "2"
+         dest: /etc/mesos-master/quorum
+
+    - name: Set mesos hostname
+      copy:
+         content: "{{ inventory_hostname }}"
+         dest: /etc/mesos-master/hostname
+
+    - name: Disable slave service
+      service: name=mesos-slave state=stopped enabled=no
+
+    - name: Restart master service
+      service: name=mesos-master state=restarted
+
+    - name: Restart marathon
+      service: name=marathon state=restarted
+
+
+- name: Setup nodes
+  hosts: mesos_node
+  remote_user: admin
+  gather_facts: False
+  become: True
+  become_method: sudo
+
+  tasks:
+
+    - name: Disable zookeeper
+      service: name=zookeeper state=stopped enabled=no
+
+    - name: Mesos zookeeper configuration
+      copy:
+         content: "zk://{{ groups['mesos_manager'][0] }}:2181,{{ groups['mesos_manager'][1] }}:2181,{{ groups['mesos_manager'][2] }}:2181/mesos"
+         dest: /etc/mesos/zk
+
+    - name: Disable master service
+      service: name=mesos-master state=stopped enabled=no
+
+    - name: Restart mesos node service
+      service: name=mesos-slave state=restarted
+

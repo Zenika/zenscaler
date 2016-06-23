@@ -19,7 +19,7 @@
         instance_type: t2.small
         image: ami-98e114f8 # see https://wiki.debian.org/Cloud/AmazonEC2Image/Jessie
         wait: true
-        exact_count: 1
+        exact_count: 3
         region: us-west-2
         key_name: mricher
         count_tag:
@@ -98,6 +98,8 @@
   gather_facts: false
   become: True
 
+  vars:
+    zk_counter: 1
   tasks:
     - name: Install JRE 1.8
       apt: name=openjdk-8-jdk
@@ -113,10 +115,21 @@
       copy: content="1" dest=/etc/zookeeper/conf/myid
       when: inventory_hostname == groups['mesos_manager'][0]
 
+    - name: Configure zookeeper - Set server id 2
+      copy: content="2" dest=/etc/zookeeper/conf/myid
+      when: inventory_hostname == groups['mesos_manager'][1]
+
+    - name: Configure zookeeper - Set server id 3
+      copy: content="3" dest=/etc/zookeeper/conf/myid
+      when: inventory_hostname == groups['mesos_manager'][2]
+    
+
     # Zookeeper quorum MUST BE 3 nodes
     - name: Server addr config
       copy:
-         content: "server.1={{ groups['mesos_manager'][0] }}:2888:3888\n"
+         content: "server.1={{ groups['mesos_manager'][0] }}:2888:3888\n
+          server.2={{ groups['mesos_manager'][1] }}:2888:3888\n
+          server.3={{ groups['mesos_manager'][2] }}:2888:3888\n"
          dest: /etc/zookeeper/conf/zoo.cfg
 
     - name: Start zookeeper service
@@ -124,12 +137,12 @@
 
     - name: Mesos zookeeper configuration
       copy:
-         content: "zk://{{ groups['mesos_manager'][0] }}:2181/mesos"
+         content: "zk://{{ groups['mesos_manager'][0] }}:2181,{{ groups['mesos_manager'][1] }}:2181,{{ groups['mesos_manager'][2] }}:2181/mesos"
          dest: /etc/mesos/zk
 
     - name: Set quorum size
       copy:
-         content: "1"
+         content: "2"
          dest: /etc/mesos-master/quorum
 
     - name: Set mesos hostname
@@ -161,7 +174,7 @@
 
     - name: Mesos zookeeper configuration
       copy:
-         content: "zk://{{ groups['mesos_manager'][0] }}:2181/mesos"
+         content: "zk://{{ groups['mesos_manager'][0] }}:2181,{{ groups['mesos_manager'][1] }}:2181,{{ groups['mesos_manager'][2] }}:2181/mesos"
          dest: /etc/mesos/zk
 
     - name: Disable master service

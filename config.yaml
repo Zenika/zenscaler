@@ -1,0 +1,14 @@
+services:
+    whoami:
+        scaler:
+            up: ""
+            down: ""
+        timeout: 5
+
+metrics:
+    mock:
+        cpu: "cmd"
+        ram: "cmd"
+
+rules:
+    cpulimit: "cpu > .25"

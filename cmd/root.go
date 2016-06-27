@@ -43,9 +43,15 @@ func parseConfig() (*service.Config, error) {
 	// add some mocks probes
 	p := config.Probes
 	p["DefaultScalingProbe"] = new(probe.DefaultScalingProbe)
+	// mock scaler
+	var mockScaler = new(service.MockScaler)
 
 	for _, key := range viper.Sub("services").AllKeys() {
-		fmt.Println(key)
+		fmt.Println("Add service: " + key)
+		config.Services = append(config.Services, service.Service{
+			Name:  key,
+			Scale: mockScaler,
+		})
 	}
 
 	return config, nil

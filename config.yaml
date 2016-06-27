@@ -3,12 +3,10 @@ services:
         scaler:
             up: "cmd"
             down: "cmd"
-        timeout: 5
     whoami2:
         scaler:
             up: "cmd up"
             down: "cmd down"
-        timeout: 20
 probes:
     mock-cpu: "basic-cpu"
     mock-ram: "basic-ram"

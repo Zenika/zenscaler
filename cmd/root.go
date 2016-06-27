@@ -3,6 +3,8 @@ package cmd
 import (
 	"fmt"
 	"zscaler/core"
+	"zscaler/probe"
+	"zscaler/service"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -24,7 +26,7 @@ func init() {
 	RootCmd.AddCommand(DumpConfigCmd)
 }
 
-func parseConfig() {
+func parseConfig() (*service.Config, error) {
 	// parse config file
 	viper.SetConfigName("config") // name of config file (without extension)
 	viper.AddConfigPath(".")      // look for config in the working directory
@@ -32,6 +34,21 @@ func parseConfig() {
 	if err != nil {               // Handle errors reading the config file
 		panic(fmt.Errorf("Fatal error config file: %s \n", err))
 	}
+
+	var config = &service.Config{
+		Services: make([]service.Service, 0),
+		Probes:   make(map[string]probe.Probe, 0),
+	}
+
+	// add some mocks probes
+	p := config.Probes
+	p["DefaultScalingProbe"] = new(probe.DefaultScalingProbe)
+
+	for _, key := range viper.Sub("services").AllKeys() {
+		fmt.Println(key)
+	}
+
+	return config, nil
 }
 
 // DumpConfigCmd definition
@@ -41,9 +58,5 @@ var DumpConfigCmd = &cobra.Command{
 	Long:  `Check, parse and dump the configuration to the standart output`,
 	Run: func(cmd *cobra.Command, args []string) {
 		parseConfig()
-		var key string
-		for _, key = range viper.Sub("services").AllKeys() {
-			fmt.Println(key)
-		}
 	},
 }

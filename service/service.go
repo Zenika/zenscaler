@@ -1,6 +1,15 @@
 package service
 
-import "time"
+import (
+	"time"
+	"zscaler/probe"
+)
+
+// Config parameters
+type Config struct {
+	Services []Service
+	Probes   map[string]probe.Probe
+}
 
 // Service descibes the object to scale
 type Service struct {
@@ -13,10 +22,4 @@ type Service struct {
 type Scaler interface {
 	Up() error
 	Down() error
-}
-
-// Probe interface
-type Probe interface {
-	Name() string
-	Value() int
 }

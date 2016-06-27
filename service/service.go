@@ -15,6 +15,7 @@ type Config struct {
 type Service struct {
 	Name  string
 	Scale Scaler
+	Probe probe.Probe
 }
 
 // Scaler interface

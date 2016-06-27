@@ -17,8 +17,11 @@ var RootCmd = &cobra.Command{
 	Long: `A Simple and Flexible scaler for various orchetrators.
 Complete documentation is available at https://github.com/zenika/zscaler/wiki`,
 	Run: func(cmd *cobra.Command, args []string) {
-		parseConfig()
-		core.Initialize()
+		config, err := parseConfig()
+		if err != nil {
+			fmt.Errorf("Error: bad configuration file, %s\n", err)
+		}
+		core.Initialize(config)
 	},
 }
 
@@ -51,6 +54,7 @@ func parseConfig() (*service.Config, error) {
 		config.Services = append(config.Services, service.Service{
 			Name:  key,
 			Scale: mockScaler,
+			Probe: p["DefaultScalingProbe"],
 		})
 	}
 

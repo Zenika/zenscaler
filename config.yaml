@@ -1,14 +1,18 @@
 services:
     whoami:
         scaler:
-            up: ""
-            down: ""
+            up: "cmd"
+            down: "cmd"
         timeout: 5
-
-metrics:
-    mock:
-        cpu: "cmd"
-        ram: "cmd"
+    whoami2:
+        scaler:
+            up: "cmd up"
+            down: "cmd down"
+        timeout: 20
+probes:
+    mock-cpu: "basic-cpu"
+    mock-ram: "basic-ram"
+    mock-response-time: "random-timer"
 
 rules:
     cpulimit: "cpu > .25"

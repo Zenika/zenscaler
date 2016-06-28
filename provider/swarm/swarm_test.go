@@ -1,18 +1,19 @@
-package provider
+package swarm
 
 import (
 	"fmt"
 	"testing"
 )
 
-func TestSwarmProvider(t *testing.T) {
-	cli := Init()
-	containers := getTaggedContainers(cli)
+func TestDockerGetTags(t *testing.T) {
+	containers := getTag("traefik")
 
 	for _, c := range containers {
-		fmt.Println("**" + c.Names[0] + "**")
+		for _, n := range c.Names {
+			fmt.Println(n)
+		}
 		for k, v := range c.Labels {
-			fmt.Println(k + ":" + v)
+			fmt.Println("- [" + k + "] " + v)
 		}
 	}
 }

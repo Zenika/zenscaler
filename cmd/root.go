@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"zscaler/core"
 	"zscaler/probe"
 	"zscaler/service"
 
@@ -17,15 +16,12 @@ var RootCmd = &cobra.Command{
 	Long: `A Simple and Flexible scaler for various orchetrators.
 Complete documentation is available at https://github.com/zenika/zscaler/wiki`,
 	Run: func(cmd *cobra.Command, args []string) {
-		config, err := parseConfig()
-		if err != nil {
-			fmt.Errorf("Error: bad configuration file, %s\n", err)
-		}
-		core.Initialize(config)
+		_ = cmd.Help()
 	},
 }
 
 func init() {
+	RootCmd.AddCommand(StartCmd)
 	RootCmd.AddCommand(DumpConfigCmd)
 }
 

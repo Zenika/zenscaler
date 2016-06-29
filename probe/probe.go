@@ -1,8 +1,6 @@
 package probe
 
-import (
-	"time"
-)
+import "time"
 
 // Probe interface
 type Probe interface {
@@ -30,4 +28,11 @@ func abs(i int) int {
 		return -i
 	}
 	return i
+}
+
+// Initialize some defaul probes
+func Initialize() map[string]Probe {
+	return map[string]Probe{
+		"DefaultScalingProbe": new(DefaultScalingProbe),
+	}
 }

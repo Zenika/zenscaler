@@ -3,8 +3,6 @@ package cmd
 import (
 	"fmt"
 	"zscaler/core"
-	"zscaler/provider/swarm"
-	"zscaler/service"
 
 	"github.com/spf13/cobra"
 )

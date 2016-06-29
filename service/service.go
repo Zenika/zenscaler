@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"time"
 	"zscaler/probe"
 )
 
@@ -15,8 +16,12 @@ type Config struct {
 type Service struct {
 	Name  string
 	Scale Scaler
-	Probe probe.Probe
+	Rule  Rule
+	Timer time.Duration
 }
+
+// Rule interface
+type Rule func() bool
 
 // Scaler interface
 type Scaler interface {

@@ -36,12 +36,9 @@ func parseConfig() (*service.Config, error) {
 
 	var config = &service.Config{
 		Services: make([]service.Service, 0),
-		Probes:   make(map[string]probe.Probe, 0),
+		Probes:   probe.Initialize(),
 	}
 
-	// add some mocks probes
-	p := config.Probes
-	p["DefaultScalingProbe"] = new(probe.DefaultScalingProbe)
 	// mock scaler
 	var mockScaler = new(service.MockScaler)
 
@@ -50,7 +47,9 @@ func parseConfig() (*service.Config, error) {
 		config.Services = append(config.Services, service.Service{
 			Name:  key,
 			Scale: mockScaler,
-			Probe: p["DefaultScalingProbe"],
+			Rule: func() bool {
+				return p["DefaultScalingProbe"].Value() > 0.5
+			},
 		})
 	}
 

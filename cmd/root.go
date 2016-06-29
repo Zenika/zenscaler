@@ -1,3 +1,4 @@
+// Package cmd provide the cli informations
 package cmd
 
 import (

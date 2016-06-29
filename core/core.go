@@ -1,3 +1,4 @@
+// Package core provide interface definition and execution flow
 package core
 
 import (

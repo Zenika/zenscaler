@@ -3,7 +3,7 @@ package service
 import (
 	"fmt"
 	"time"
-	"zscaler/probe"
+	"zscaler/core/probe"
 )
 
 // Config parameters

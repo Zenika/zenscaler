@@ -2,8 +2,8 @@ package core
 
 import (
 	"time"
-	"zscaler/provider/swarm"
-	"zscaler/service"
+	"zscaler/core/service"
+	"zscaler/swarm"
 )
 
 // Initialize core module
@@ -16,9 +16,7 @@ func Initialize(config *service.Config) {
 
 // event loop
 func loop(config *service.Config) {
-	for {
 
-	}
 }
 
 func serviceWatcher(errchan chan error, service service.Service) {

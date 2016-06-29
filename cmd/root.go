@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"fmt"
-	"zscaler/probe"
-	"zscaler/service"
+	"zscaler/core/probe"
+	"zscaler/core/service"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

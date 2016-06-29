@@ -3,8 +3,8 @@ package cmd
 
 import (
 	"fmt"
-	"zscaler/core/probe"
-	"zscaler/core/service"
+	"zscaler/core"
+	"zscaler/core/rule"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -26,32 +26,22 @@ func init() {
 	RootCmd.AddCommand(DumpConfigCmd)
 }
 
-func parseConfig() (*service.Config, error) {
+func parseConfig() (*core.Config, error) {
 	// parse config file
 	viper.SetConfigName("config") // name of config file (without extension)
 	viper.AddConfigPath(".")      // look for config in the working directory
 	err := viper.ReadInConfig()   // Find and read the config file
 	if err != nil {               // Handle errors reading the config file
-		panic(fmt.Errorf("Fatal error config file: %s \n", err))
+		panic(fmt.Sprintf("Fatal error config file: %s \n", err))
 	}
 
-	var config = &service.Config{
-		Services: make([]service.Service, 0),
-		Probes:   probe.Initialize(),
+	var config = &core.Config{
+		Rules: make([]rule.Rule, 0),
 	}
-
-	// mock scaler
-	var mockScaler = new(service.MockScaler)
-
-	for _, key := range viper.Sub("services").AllKeys() {
-		fmt.Println("Add service: " + key)
-		config.Services = append(config.Services, service.Service{
-			Name:  key,
-			Scale: mockScaler,
-			Rule: func() bool {
-				return p["DefaultScalingProbe"].Value() > 0.5
-			},
-		})
+	var services = make([]rule.Service, 0)
+	for _, name := range viper.Sub("").AllKeys() {
+		fmt.Println("Add service [" + name + "]")
+		services = append(services, rule.MockService(name))
 	}
 
 	return config, nil

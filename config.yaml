@@ -7,10 +7,7 @@ services:
         scaler:
             up: "cmd up"
             down: "cmd down"
-probes:
-    mock-cpu: "basic-cpu"
-    mock-ram: "basic-ram"
-    mock-response-time: "random-timer"
-
 rules:
-    cpulimit: "cpu > .25"
+    cpudefault:
+        taget: "whoami"
+    

@@ -2,25 +2,32 @@
 package core
 
 import (
-	"time"
-	"zscaler/core/service"
-	"zscaler/swarm"
+	"fmt"
+	"os"
+	"zscaler/core/rule"
 )
 
+const bufferSize = 10
+
+// Config holder
+type Config struct {
+	Rules   []rule.Rule
+	errchan chan error
+}
+
 // Initialize core module
-func Initialize(config *service.Config) {
-	// preliminary check
-	checked = swarm.CheckServices(config.Services)
-	loop(config)
-	// exit cleanup
+func (c Config) Initialize() {
+	c.errchan = make(chan error, bufferSize)
+	c.loop()
 }
 
 // event loop
-func loop(config *service.Config) {
-
-}
-
-func serviceWatcher(errchan chan error, service service.Service) {
-
-	time.Sleep(service.Timer)
+func (c Config) loop() {
+	// lanch a watcher on each rule
+	for _, r := range c.Rules {
+		go rule.Watcher(c.errchan, r)
+	}
+	// watch for errors
+	_ = fmt.Errorf("%s", <-c.errchan)
+	os.Exit(-1)
 }

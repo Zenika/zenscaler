@@ -1,33 +1,20 @@
-package service
+package rule
 
-import (
-	"fmt"
-	"time"
-	"zscaler/core/probe"
-)
+import "fmt"
 
-// Config parameters
-type Config struct {
-	Services []Service
-	Probes   map[string]probe.Probe
-}
-
-// Service descibes the object to scale
-type Service struct {
-	Name  string
-	Scale Scaler
-	Rule  Rule
-	Timer time.Duration
-}
-
-// Rule interface
-type Rule func() bool
-
-// Scaler interface
+// Scaler control the service
 type Scaler interface {
 	Describe() string
 	Up() error
 	Down() error
+}
+
+// MockService is a wrapper for the MockScaler
+func MockService(name string) Service {
+	return Service{
+		Name:  name,
+		Scale: new(MockScaler),
+	}
 }
 
 // MockScaler write "scale up" or "scale down" to stdout

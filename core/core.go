@@ -23,6 +23,7 @@ func (c Config) Initialize() {
 
 // event loop
 func (c Config) loop() {
+	fmt.Println("Enter control loop...")
 	// lanch a watcher on each rule
 	for _, r := range c.Rules {
 		go rule.Watcher(c.errchan, r)

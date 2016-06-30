@@ -4,8 +4,8 @@ package cmd
 import (
 	"fmt"
 	"zscaler/core"
-	"zscaler/core/probe"
 	"zscaler/core/rule"
+	"zscaler/swarm"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -42,13 +42,16 @@ func parseConfig() (*core.Config, error) {
 	}
 	// loop over the services
 	// create one default rule by service
-	for _, name := range viper.Sub("services").AllKeys() {
-		fmt.Println("Add service [" + name + "] using DefaultRule")
+	rules := viper.Sub("rules")
+	for _, r := range rules.AllKeys() {
+		target := rules.Sub(r).GetString("target")
+		fmt.Println("Add service [" + target + "] using DefaultRule")
 		config.Rules = append(config.Rules, rule.Default{
-			Target: rule.MockService(name),
-			Probe:  new(probe.DefaultScalingProbe),
+			Target: rule.MockService(target),
+			Probe:  &swarm.AverageCPU{Tag: target},
 		})
 	}
+	fmt.Println("Configuration comlete !")
 	return config, nil
 }
 

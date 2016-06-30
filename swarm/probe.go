@@ -4,7 +4,7 @@ import "github.com/docker/engine-api/types"
 
 // AverageCPU probe of all containers
 type AverageCPU struct {
-	tag string
+	Tag string
 }
 
 // Name of probe
@@ -15,7 +15,7 @@ func (info AverageCPU) Name() string {
 // Value return average CPU consuption of all service containers
 func (info AverageCPU) Value() float64 {
 	sp := getAPI()
-	containers := sp.getTag(info.tag)
+	containers := sp.getTag(info.Tag)
 
 	var cpusum float64
 	for _, c := range containers {

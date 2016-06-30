@@ -1,13 +1,4 @@
-services:
-    whoami:
-        scaler:
-            up: "cmd"
-            down: "cmd"
-    whoami2:
-        scaler:
-            up: "cmd up"
-            down: "cmd down"
 rules:
-    cpudefault:
-        taget: "whoami"
-    
+    whoami-cpu-scale:
+        target: "whoami"
+        probe: "cpudefault"

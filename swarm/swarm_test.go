@@ -6,7 +6,7 @@ import (
 )
 
 func TestDockerGetTags(t *testing.T) {
-	containers := getTag("traefik")
+	containers := getAPI().getTag("traefik")
 
 	for _, c := range containers {
 		for _, n := range c.Names {

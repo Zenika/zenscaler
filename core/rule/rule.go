@@ -24,8 +24,8 @@ func Watcher(c chan error, r Rule) {
 	}
 }
 
-// DefaultRule provide a basic implementation
-type DefaultRule struct {
+// Default provide a basic implementation
+type Default struct {
 	Target Service
 	Probe  probe.Probe
 }
@@ -37,7 +37,7 @@ type Service struct {
 }
 
 // Check the probe, UP and DOWN at top and low quater
-func (r DefaultRule) Check() error {
+func (r Default) Check() error {
 	if r.Probe.Value() > 0.75 {
 		r.Target.Scale.Up()
 	}
@@ -48,6 +48,6 @@ func (r DefaultRule) Check() error {
 }
 
 // CheckInterval return the time to wait between each check
-func (r DefaultRule) CheckInterval() time.Duration {
+func (r Default) CheckInterval() time.Duration {
 	return 3 * time.Second
 }

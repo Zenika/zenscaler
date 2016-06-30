@@ -44,7 +44,7 @@ func parseConfig() (*core.Config, error) {
 	// create one default rule by service
 	for _, name := range viper.Sub("services").AllKeys() {
 		fmt.Println("Add service [" + name + "] using DefaultRule")
-		config.Rules = append(config.Rules, rule.DefaultRule{
+		config.Rules = append(config.Rules, rule.Default{
 			Target: rule.MockService(name),
 			Probe:  new(probe.DefaultScalingProbe),
 		})

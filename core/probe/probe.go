@@ -5,7 +5,7 @@ import "time"
 // Probe interface
 type Probe interface {
 	Name() string
-	Value() float32
+	Value() float64
 }
 
 // DefaultScalingProbe report a fake sensor value
@@ -18,9 +18,9 @@ func (p *DefaultScalingProbe) Name() string {
 }
 
 // Value of the probe
-func (p *DefaultScalingProbe) Value() float32 {
+func (p *DefaultScalingProbe) Value() float64 {
 	_, _, s := time.Now().Clock()
-	return float32(abs(s-30)) / float32(30)
+	return float64(abs(s-30)) / float64(30)
 }
 
 func abs(i int) int {
@@ -28,11 +28,4 @@ func abs(i int) int {
 		return -i
 	}
 	return i
-}
-
-// Initialize some defaul probes
-func Initialize() map[string]Probe {
-	return map[string]Probe{
-		"DefaultScalingProbe": new(DefaultScalingProbe),
-	}
 }

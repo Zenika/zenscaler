@@ -4,6 +4,7 @@ package cmd
 import (
 	"fmt"
 	"zscaler/core"
+	"zscaler/core/probe"
 	"zscaler/core/rule"
 
 	"github.com/spf13/cobra"
@@ -35,15 +36,19 @@ func parseConfig() (*core.Config, error) {
 		panic(fmt.Sprintf("Fatal error config file: %s \n", err))
 	}
 
+	// global configuration structure
 	var config = &core.Config{
 		Rules: make([]rule.Rule, 0),
 	}
-	var services = make([]rule.Service, 0)
-	for _, name := range viper.Sub("").AllKeys() {
-		fmt.Println("Add service [" + name + "]")
-		services = append(services, rule.MockService(name))
+	// loop over the services
+	// create one default rule by service
+	for _, name := range viper.Sub("services").AllKeys() {
+		fmt.Println("Add service [" + name + "] using DefaultRule")
+		config.Rules = append(config.Rules, rule.DefaultRule{
+			Target: rule.MockService(name),
+			Probe:  new(probe.DefaultScalingProbe),
+		})
 	}
-
 	return config, nil
 }
 

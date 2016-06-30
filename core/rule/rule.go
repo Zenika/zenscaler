@@ -36,7 +36,7 @@ type Service struct {
 	Scale Scaler
 }
 
-// Check the mock probe
+// Check the probe, UP and DOWN at top and low quater
 func (r DefaultRule) Check() error {
 	if r.Probe.Value() > 0.75 {
 		r.Target.Scale.Up()
@@ -45,4 +45,9 @@ func (r DefaultRule) Check() error {
 		r.Target.Scale.Down()
 	}
 	return nil
+}
+
+// CheckInterval return the time to wait between each check
+func (r DefaultRule) CheckInterval() time.Duration {
+	return 3 * time.Second
 }

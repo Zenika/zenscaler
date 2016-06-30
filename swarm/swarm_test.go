@@ -17,3 +17,10 @@ func TestDockerGetTags(t *testing.T) {
 		}
 	}
 }
+
+func TestPobe(t *testing.T) {
+	var probe = AverageCPU{
+		tag: "traefik",
+	}
+	fmt.Printf("%.2f\n", probe.Value())
+}

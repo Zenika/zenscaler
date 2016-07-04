@@ -1,0 +1,137 @@
+---
+
+# AWS token should be exported beforehand
+# export AWS_ACCESS_KEY_ID='AK123'
+# export AWS_SECRET_ACCESS_KEY='abc123'
+
+# From http://docs.ansible.com/ansible/guide_aws.html
+
+- name: Provision 4 debian 8.4 t2.small instances @us-west-2
+  hosts: 127.0.0.1
+  connection: local
+  gather_facts: false
+
+  tasks:
+
+    - name: Provision managers instances
+      ec2:
+        group: zscaler-test
+        instance_type: t2.medium
+        image: ami-98e114f8 # see https://wiki.debian.org/Cloud/AmazonEC2Image/Jessie
+        wait: true
+        exact_count: 1
+        region: us-west-2
+        key_name: mricher
+        count_tag:
+           Name: swarm-manager
+        instance_tags:
+           Name: swarm-manager
+      register: ec2
+
+    - name: Add instance public IPs to swarm host group
+      add_host: name={{ item.public_ip }} groups=swarm,swarm_manager
+      with_items: "{{ ec2.tagged_instances }}"
+
+    - name: Provision nodes instances
+      ec2:
+        group: zscaler-test
+        instance_type: t2.medium
+        image: ami-98e114f8 # see https://wiki.debian.org/Cloud/AmazonEC2Image/Jessie
+        wait: true
+        exact_count: 4
+        region: us-west-2
+        key_name: mricher
+        count_tag:
+           Name: swarm-node
+        instance_tags:
+           Name: swarm-node
+      register: ec2
+
+    - name: Add instance public IPs to swarm host group
+      add_host: name={{ item.public_ip }} groups=swarm,swarm_node
+      with_items: "{{ ec2.tagged_instances }}"
+
+- name: Global instances configuration
+  hosts: swarm
+  remote_user: admin
+  gather_facts: false
+  become: True
+  become_method: sudo
+
+  tasks:
+    - name: Wait 80s for DNS resolution
+      pause: seconds=80
+
+    - name: Wait for SSH to come up
+      wait_for: port=22 delay=30 timeout=180 state=started
+
+    - name: Add docker apt key
+      apt_key: keyserver=hkp://p80.pool.sks-keyservers.net:80 id=58118E89F3A912897C070ADBF76221572C52609D
+
+    - name: Add docker repo
+      apt_repository: repo='deb https://apt.dockerproject.org/repo debian-jessie testing' state=present
+
+    - name: Install docker
+      apt: name=docker-engine update_cache=yes
+
+    - name: Install pip
+      easy_install: name=pip state=latest
+
+    - name: Install docker wrapper
+      apt: name=python-docker update_cache=yes
+
+    - name: Install docker python API
+      pip: name=docker-py state=latest
+
+- name: Setup primary cluster manager
+  hosts: swarm_manager[0]
+  remote_user: admin
+  gather_facts: False
+  become: True
+  become_method: sudo
+
+  tasks:
+    - name: Check systemd Docker configuration file
+      file: state=directory path=/etc/systemd/system/docker.service.d
+
+    - name: Create systemd docker config file socket.conf
+      copy:
+        # TODO replace this using a template
+        content: "[Service]\nExecStart=\nExecStart=/usr/bin/docker daemon -H fd:// -H tcp://0.0.0.0:4001"
+        dest: /etc/systemd/system/docker.service.d/socket.conf
+
+    - name: Reload systemctl
+      command: "systemctl daemon-reload"
+
+    - name: Restart Docker service 
+      service: name=docker state=restarted
+
+    - name: Start swarm cluster master
+      shell: "docker swarm init --listen-addr :2377"
+
+    - shell: "docker info"
+      register: result
+    - debug: var=result verbosity=2
+
+- name: Setup nodes
+  hosts: swarm_node
+  remote_user: admin
+  gather_facts: False
+  become: True
+  become_method: sudo
+
+  tasks:
+    - name: Node join swarm
+      shell: "docker swarm join {{ groups['swarm_manager'][0] }}:2377"
+
+- name: Check
+  hosts: swarm_manager[0]
+  remote_user: admin
+  gather_facts: False
+  become: True
+  become_method: sudo
+
+  tasks:
+    - shell: "docker node ls"
+      register: result
+    - debug: var=result verbosity=2

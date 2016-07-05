@@ -4,8 +4,8 @@ package cmd
 import (
 	"fmt"
 	"zscaler/core"
+	"zscaler/core/probe"
 	"zscaler/core/rule"
-	"zscaler/swarm"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -47,11 +47,12 @@ func parseConfig() (*core.Config, error) {
 		target := rules.Sub(r).GetString("target")
 		fmt.Println("Add service [" + target + "] using DefaultRule")
 		config.Rules = append(config.Rules, rule.Default{
-			Target: rule.MockService(target),
-			Probe:  &swarm.AverageCPU{Tag: target},
+			Target: rule.ComposeService(target),
+			Probe:  &probe.DefaultScalingProbe{},
+			// Probe:  &swarm.AverageCPU{Tag: target},
 		})
 	}
-	fmt.Println("Configuration comlete !")
+	fmt.Println("Configuration complete !")
 	return config, nil
 }
 

@@ -7,8 +7,8 @@ import (
 
 // A Rule must be able to perform a check
 type Rule interface {
-	Check() error // performe a check on the target and act if needed
-	CheckInterval() time.Duration
+	Check() error                 // performe a check on the target and act if needed
+	CheckInterval() time.Duration // time to wait between each check
 }
 
 // Watcher check periodically the rule and report back errors
@@ -24,7 +24,7 @@ func Watcher(c chan error, r Rule) {
 	}
 }
 
-// Default provide a basic implementation
+// Default provide a basic rule implementation
 type Default struct {
 	Target Service
 	Probe  probe.Probe

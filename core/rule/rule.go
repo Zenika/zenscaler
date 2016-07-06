@@ -1,6 +1,7 @@
 package rule
 
 import (
+	"fmt"
 	"time"
 	"zscaler/core/probe"
 )
@@ -38,10 +39,13 @@ type Service struct {
 
 // Check the probe, UP and DOWN at top and low quater
 func (r Default) Check() error {
-	if r.Probe.Value() > 0.75 {
+	fmt.Printf("Checking probe... ")
+	probe := r.Probe.Value()
+	fmt.Printf("at %.2f\n", probe)
+	if probe > 0.75 {
 		r.Target.Scale.Up()
 	}
-	if r.Probe.Value() < 0.25 {
+	if probe < 0.25 {
 		r.Target.Scale.Down()
 	}
 	return nil

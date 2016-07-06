@@ -1,11 +1,48 @@
-zscaler
+zScaler
 =======
 
-Zscaler aims to be an environement-agnostic, simple yet intelligent scaler.
+Zscaler aims to be an environement-agnostic, simple yet intelligent scaler. Target environements are Kubernetes, Rancher, Mesos and Swarm.
 
-Target environements are Kubernetes, Rancher, Mesos and Swarm.
+Usage
+-----
 
-Deploy on EC2
+### Configuration file
+
+```
+rules:                      # rule section
+    whoami-cpu-scale:       # custom name of the service
+        target: "whoami"    # name of service as tagged in orchestrator
+        probe: "cpudefault" # probe to use
+```
+
+### Command line interface
+
+```
+$ zscaler [command]
+Available Commands:
+  dumpconfig  Dump parsed config file to stdout
+  start       Start autoscaler
+```
+
+Dependencies
+------------
+
+You'll need Go (1.5+) and an orchestrator :
+* doker (api 1.22+) or docker-swarm
+    * docker-compose (1.7.1) if you use it
+* kubernetes (_TBD_)
+* Mesos (_TBD_)
+
+Build it
+--------
+- Install Goalang and set you `$GOPATH`
+- Clone this repo in `$GOPATH/src` and do
+```
+make all
+```
+This will download go dependency
+
+Aside : Deploy on EC2
 -------------
 
 You'll need:

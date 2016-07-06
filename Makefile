@@ -1,5 +1,6 @@
-all:
-	go build .
+all: deps install
+deps:
+	go get -u ./...
 install:
 	go install .
 test:

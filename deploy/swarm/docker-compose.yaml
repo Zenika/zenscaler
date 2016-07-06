@@ -20,6 +20,7 @@ services:
   labels:
     - "traefik.backend=whoami"
     - "traefik.frontend.rule=Host:whoami.docker.localhost"
+  cpu_shares: 25
 
 networks:
  public:

@@ -8,7 +8,7 @@ Usage
 
 ### Configuration file
 
-```
+```YAML
 endpoint: "unix:///var/run/docker.sock"
 rules:                      # rule section
     whoami-cpu-scale:       # custom name of the service
@@ -23,7 +23,7 @@ rules:                      # rule section
 
 ### Command line interface
 
-```
+```BASH
 $ zscaler [command]
 Available Commands:
   dumpconfig  Dump parsed config file to stdout
@@ -43,7 +43,7 @@ Build it
 --------
 - Install Goalang and set you `$GOPATH`
 - Clone this repo in `$GOPATH/src` and do
-```
+```BASH
 make all
 ```
 This will download go dependency
@@ -56,21 +56,21 @@ You'll need:
 - `docker  1.10.3 (API 1.22)`
 
 First export some parameters:
-```
+```BASH
 export AWS_ACCESS_KEY_ID='ACME******'
 export AWS_SECRET_ACCESS_KEY='acme*************'
 export ANSIBLE_HOST_KEY_CHECKING=False
 ```
 
 Provision swarm cluster:
-```
+```BASH
 ansible-playbook aws-provision.yaml
 ```
 
 Swarm socket is at `<master>:4000`, you can check it with `docker -H <master>:4000 info`.
 
 Disallocate cluster (using dynamic inventory)
-```
+```BASH
 ansible-playbook -i ec2.py aws-terminate.yaml
 ```
 

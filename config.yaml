@@ -1,7 +1,10 @@
+endpoint: "unix:///var/run/docker.sock"
 rules:
     whoami-cpu-scale:
         target: "whoami"
         probe: "cpudefault"
+        refresh: 3s
     whoami2-cpu-scale:
         target: "whoami2"
         probe: "cpudefault"
+        refresh: 10s

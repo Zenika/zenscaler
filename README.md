@@ -9,10 +9,16 @@ Usage
 ### Configuration file
 
 ```
+endpoint: "unix:///var/run/docker.sock"
 rules:                      # rule section
     whoami-cpu-scale:       # custom name of the service
         target: "whoami"    # name of service as tagged in orchestrator
         probe: "cpudefault" # probe to use
+        refresh: 3s         # scaler refresh rate
+    whoami2-cpu-scale:
+        target: "whoami2"
+        probe: "cpudefault"
+        refresh: 10s
 ```
 
 ### Command line interface

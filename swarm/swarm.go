@@ -10,6 +10,7 @@ import (
 	"github.com/docker/engine-api/client"
 	"github.com/docker/engine-api/types"
 	"github.com/docker/engine-api/types/filters"
+	"github.com/spf13/viper"
 	"golang.org/x/net/context"
 )
 
@@ -24,7 +25,7 @@ var provider *Provider
 func getAPI() Provider {
 	if provider == nil {
 		defaultHeaders := map[string]string{"User-Agent": "engine-api-cli-1.0"}
-		cli, err := client.NewClient("unix:///var/run/docker.sock", "v1.22", nil, defaultHeaders)
+		cli, err := client.NewClient(viper.GetString("endpoint"), "v1.22", nil, defaultHeaders)
 		if err != nil {
 			panic(err)
 		}

@@ -47,8 +47,9 @@ func parseConfig() (*core.Config, error) {
 		target := rules.Sub(r).GetString("target")
 		fmt.Println("Add service [" + target + "]")
 		config.Rules = append(config.Rules, rule.Default{
-			Target: rule.ComposeService(target),
-			Probe:  &swarm.AverageCPU{Tag: target},
+			Target:      rule.ComposeService(target),
+			Probe:       &swarm.AverageCPU{Tag: target},
+			RefreshRate: rules.Sub(r).GetDuration("refresh"),
 		})
 	}
 	fmt.Println("Configuration complete !")

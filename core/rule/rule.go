@@ -27,8 +27,9 @@ func Watcher(c chan error, r Rule) {
 
 // Default provide a basic rule implementation
 type Default struct {
-	Target Service
-	Probe  probe.Probe
+	Target      Service
+	Probe       probe.Probe
+	RefreshRate time.Duration
 }
 
 // Service describes the object to scale
@@ -53,5 +54,5 @@ func (r Default) Check() error {
 
 // CheckInterval return the time to wait between each check
 func (r Default) CheckInterval() time.Duration {
-	return 3 * time.Second
+	return r.RefreshRate
 }

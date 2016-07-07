@@ -69,15 +69,16 @@ func (sp Provider) getTag(tag string) []types.Container {
 func (sp Provider) getStats(cID string) *types.StatsJSON {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	fmt.Println("Get Stats")
+	fmt.Println("Get Stats for " + cID)
 	r, err := sp.cli.ContainerStats(ctx, cID, false)
 	if err != nil {
 		return nil
 	}
+	fmt.Println("Decode JSON for " + cID)
 	var stats = new(types.StatsJSON)
 	json.NewDecoder(r).Decode(stats)
 	r.Close()
-	fmt.Println("return stats")
+	fmt.Println("return stats for " + cID)
 	return stats
 }
 

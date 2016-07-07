@@ -22,5 +22,15 @@ services:
     - "traefik.frontend.rule=Host:whoami.docker.localhost"
   cpu_shares: 25
 
+ whoami2:
+  image: emilevauge/whoami
+  networks:
+    - public
+  labels:
+    - "traefik.backend=whoami2"
+    - "traefik.frontend.rule=Host:whoami2.docker.localhost"
+  cpu_shares: 50
+
+
 networks:
  public:

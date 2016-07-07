@@ -18,8 +18,14 @@ func (info AverageCPU) Value() float64 {
 	containers := sp.getTag(info.Tag)
 
 	var cpusum float64
+	var reportCPU = make(chan float64, len(containers))
 	for _, c := range containers {
-		cpusum = +calculateCPUPercent(sp.getStats(c.ID))
+		go func(c types.Container) {
+			reportCPU <- calculateCPUPercent(sp.getStats(c.ID))
+		}(c)
+	}
+	for range containers {
+		cpusum = +<-reportCPU
 	}
 	return cpusum / float64(len(containers))
 }

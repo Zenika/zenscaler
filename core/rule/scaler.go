@@ -46,7 +46,7 @@ func ComposeService(name string) Service {
 	return Service{
 		Name: name,
 		Scale: &ComposeScaler{
-			serviceName:       "whoami",
+			serviceName:       name,
 			configFile:        "/home/maximilien/zenika/zscaler/deploy/swarm/docker-compose.yaml",
 			runningContainers: 3,
 		},

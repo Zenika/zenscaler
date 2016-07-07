@@ -45,7 +45,7 @@ func parseConfig() (*core.Config, error) {
 	rules := viper.Sub("rules")
 	for _, r := range rules.AllKeys() {
 		target := rules.Sub(r).GetString("target")
-		fmt.Println("Add service [" + target + "] using DefaultRule")
+		fmt.Println("Add service [" + target + "]")
 		config.Rules = append(config.Rules, rule.Default{
 			Target: rule.ComposeService(target),
 			Probe:  &swarm.AverageCPU{Tag: target},

@@ -2,3 +2,6 @@ rules:
     whoami-cpu-scale:
         target: "whoami"
         probe: "cpudefault"
+    whoami2-cpu-scale:
+        target: "whoami2"
+        probe: "cpudefault"

@@ -3,11 +3,13 @@ package swarm
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"time"
 	"zscaler/core/rule"
 
 	"github.com/docker/engine-api/client"
 	"github.com/docker/engine-api/types"
+	"github.com/docker/engine-api/types/filters"
 	"golang.org/x/net/context"
 )
 
@@ -16,14 +18,19 @@ type Provider struct {
 	cli *client.Client
 }
 
+var provider *Provider
+
 // getAPI return a provider
 func getAPI() Provider {
-	defaultHeaders := map[string]string{"User-Agent": "engine-api-cli-1.0"}
-	cli, err := client.NewClient("unix:///var/run/docker.sock", "v1.22", nil, defaultHeaders)
-	if err != nil {
-		panic(err)
+	if provider == nil {
+		defaultHeaders := map[string]string{"User-Agent": "engine-api-cli-1.0"}
+		cli, err := client.NewClient("unix:///var/run/docker.sock", "v1.22", nil, defaultHeaders)
+		if err != nil {
+			panic(err)
+		}
+		provider = &Provider{cli: cli}
 	}
-	return Provider{cli: cli}
+	return *provider
 }
 
 // Check if service is started
@@ -45,27 +52,33 @@ func (sp Provider) getAll() []types.Container {
 }
 
 func (sp Provider) getTag(tag string) []types.Container {
-	var tagged []types.Container
-	containers := sp.getAll()
-	for _, c := range containers {
-		for _, v := range c.Labels {
-			if v == tag {
-				tagged = append(tagged, c)
-			}
-		}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	tagFilter := filters.NewArgs()
+	tagFilter.Add("label", "com.docker.compose.service="+tag)
+	options := types.ContainerListOptions{Filter: tagFilter}
+	fmt.Println("Get ContainerList")
+	tagged, err := sp.cli.ContainerList(ctx, options)
+	if err != nil {
+		panic(err)
 	}
+	fmt.Println("Got it !")
 	return tagged
 }
 
 func (sp Provider) getStats(cID string) *types.StatsJSON {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+	fmt.Println("Get Stats for " + cID)
 	r, err := sp.cli.ContainerStats(ctx, cID, false)
 	if err != nil {
 		return nil
 	}
+	fmt.Println("Decode JSON for " + cID)
 	var stats = new(types.StatsJSON)
 	json.NewDecoder(r).Decode(stats)
+	r.Close()
+	fmt.Println("return stats for " + cID)
 	return stats
 }
 
@@ -73,7 +86,7 @@ func (sp Provider) getStats(cID string) *types.StatsJSON {
 func (sp Provider) ScaleUp(tag string) error {
 	containers := sp.getTag(tag)
 	if len(containers) == 0 {
-		return errors.New("Cannot scale up: target service not found")
+		return errors.New("Cannot scale up: target [" + tag + "] not found")
 	}
 	sp.duplicateAndStart(containers[0].ID)
 	return nil

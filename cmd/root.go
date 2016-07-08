@@ -8,6 +8,7 @@ import (
 	"zscaler/core/rule"
 	"zscaler/swarm"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -34,7 +35,7 @@ func parseConfig() (*core.Config, error) {
 	viper.AddConfigPath(".")      // look for config in the working directory
 	err := viper.ReadInConfig()   // Find and read the config file
 	if err != nil {               // Handle errors reading the config file
-		panic(fmt.Sprintf("Fatal error config file: %s \n", err))
+		log.Panicf("Fatal error in config file: %s \n", err)
 	}
 
 	// global configuration structure
@@ -46,7 +47,7 @@ func parseConfig() (*core.Config, error) {
 	rules := viper.Sub("rules")
 	for _, r := range rules.AllKeys() {
 		target := rules.Sub(r).GetString("target")
-		fmt.Println("Add service [" + target + "]")
+		log.Info("Add service [" + target + "]")
 
 		// Parse rules
 		up, err := rule.Decode(rules.Sub(r).GetString("up"))
@@ -65,7 +66,7 @@ func parseConfig() (*core.Config, error) {
 			Down:        down,
 		})
 	}
-	fmt.Println("Configuration complete !")
+	log.Info("Configuration complete !")
 	return config, nil
 }
 

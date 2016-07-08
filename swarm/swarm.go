@@ -3,10 +3,10 @@ package swarm
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"time"
 	"zscaler/core/rule"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/docker/engine-api/client"
 	"github.com/docker/engine-api/types"
 	"github.com/docker/engine-api/types/filters"
@@ -27,7 +27,7 @@ func getAPI() Provider {
 		defaultHeaders := map[string]string{"User-Agent": "engine-api-cli-1.0"}
 		cli, err := client.NewClient(viper.GetString("endpoint"), "v1.22", nil, defaultHeaders)
 		if err != nil {
-			panic(err)
+			log.Panic(err)
 		}
 		provider = &Provider{cli: cli}
 	}
@@ -47,7 +47,7 @@ func (sp Provider) getAll() []types.Container {
 	// TODO ctx for timeout
 	containers, err := sp.cli.ContainerList(context.Background(), options)
 	if err != nil {
-		panic(err)
+		log.Panic(err)
 	}
 	return containers
 }
@@ -58,28 +58,24 @@ func (sp Provider) getTag(tag string) []types.Container {
 	tagFilter := filters.NewArgs()
 	tagFilter.Add("label", "com.docker.compose.service="+tag)
 	options := types.ContainerListOptions{Filter: tagFilter}
-	fmt.Println("Get ContainerList")
 	tagged, err := sp.cli.ContainerList(ctx, options)
 	if err != nil {
-		panic(err)
+		log.Panic(err)
 	}
-	fmt.Println("Got it !")
 	return tagged
 }
 
 func (sp Provider) getStats(cID string) *types.StatsJSON {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	fmt.Println("Get Stats for " + cID)
+	log.Debug("Get Stats for " + cID)
 	r, err := sp.cli.ContainerStats(ctx, cID, false)
 	if err != nil {
 		return nil
 	}
-	fmt.Println("Decode JSON for " + cID)
 	var stats = new(types.StatsJSON)
 	json.NewDecoder(r).Decode(stats)
 	r.Close()
-	fmt.Println("return stats for " + cID)
 	return stats
 }
 

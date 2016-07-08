@@ -1,8 +1,7 @@
 package cmd
 
 import (
-	"fmt"
-
+	log "github.com/Sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -13,7 +12,7 @@ var StartCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		config, err := parseConfig()
 		if err != nil {
-			panic(fmt.Sprintf("Fatal error config file: %s \n", err))
+			log.Panicf("Fatal error reading config file: %s \n", err)
 		}
 		config.Initialize()
 	},

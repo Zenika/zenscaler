@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"time"
 	"zscaler/core/probe"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 // A Rule must be able to perform a check
@@ -43,9 +45,8 @@ type Service struct {
 
 // Check the probe, UP and DOWN at top and low quater
 func (r Default) Check() error {
-	fmt.Printf("Checking probe... ")
 	probe := r.Probe.Value()
-	fmt.Printf("at %.2f\n", probe)
+	log.Debug(fmt.Sprintf("["+r.Target.Name+"] "+r.Probe.Name()+"at %.2f\n", probe))
 	if probe > 0.75 {
 		r.Target.Scale.Up()
 	}
@@ -71,11 +72,10 @@ type FloatValue struct {
 
 // Check the probe, UP and DOWN
 func (r FloatValue) Check() error {
-	fmt.Printf("Checking probe... ")
 	probe := r.Probe.Value()
-	fmt.Printf("at %.2f\n", probe)
+	log.Debug(fmt.Sprintf("["+r.Target.Name+"] "+r.Probe.Name()+"at %.2f\n", probe))
 	if r.Up(probe) && r.Down(probe) {
-		fmt.Println("[" + r.Target.Name + "] try to scale up and down at the same time! (nothing done)")
+		log.Warning("[" + r.Target.Name + "] try to scale up and down at the same time! (nothing done)")
 		return nil
 	}
 	if r.Up(probe) {

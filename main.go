@@ -1,14 +1,13 @@
 package main
 
 import (
-	"fmt"
-	"os"
 	"zscaler/cmd"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 func main() {
 	if err := cmd.RootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(-1)
+		log.Fatalf("%s", err)
 	}
 }

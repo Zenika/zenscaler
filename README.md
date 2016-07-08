@@ -14,10 +14,14 @@ rules:                      # rule section
     whoami-cpu-scale:       # custom name of the service
         target: "whoami"    # name of service as tagged in orchestrator
         probe: "cpudefault" # probe to use
+        up: "> 0.75"        # up rule
+        down: "< 0.25"      # down rule
         refresh: 3s         # scaler refresh rate
     whoami2-cpu-scale:
         target: "whoami2"
         probe: "cpudefault"
+        up: "> 2"
+        down: "< 1.5"
         refresh: 10s
 ```
 

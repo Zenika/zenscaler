@@ -2,6 +2,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"zscaler/core"
 	"zscaler/core/rule"
@@ -46,10 +47,22 @@ func parseConfig() (*core.Config, error) {
 	for _, r := range rules.AllKeys() {
 		target := rules.Sub(r).GetString("target")
 		fmt.Println("Add service [" + target + "]")
-		config.Rules = append(config.Rules, rule.Default{
+
+		// Parse rules
+		up, err := rule.Decode(rules.Sub(r).GetString("up"))
+		if err != nil {
+			return nil, errors.New(target + fmt.Sprintf(": %v up", err))
+		}
+		down, err := rule.Decode(rules.Sub(r).GetString("down"))
+		if err != nil {
+			return nil, errors.New(target + fmt.Sprintf(": %v down", err))
+		}
+		config.Rules = append(config.Rules, rule.FloatValue{
 			Target:      rule.ComposeService(target),
 			Probe:       &swarm.AverageCPU{Tag: target},
 			RefreshRate: rules.Sub(r).GetDuration("refresh"),
+			Up:          up,
+			Down:        down,
 		})
 	}
 	fmt.Println("Configuration complete !")

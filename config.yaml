@@ -3,8 +3,12 @@ rules:
     whoami-cpu-scale:
         target: "whoami"
         probe: "cpudefault"
+        up: "> 0.75"
+        down: "< 0.25"
         refresh: 3s
     whoami2-cpu-scale:
         target: "whoami2"
         probe: "cpudefault"
+        up: "> 2"
+        down: "< 1.5"
         refresh: 10s

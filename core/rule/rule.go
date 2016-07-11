@@ -2,7 +2,6 @@ package rule
 
 import (
 	"errors"
-	"fmt"
 	"regexp"
 	"strconv"
 	"time"
@@ -42,7 +41,7 @@ type Default struct {
 // Check the probe, UP and DOWN at top and low quater
 func (r Default) Check() error {
 	probe := r.Probe.Value()
-	log.Debug(fmt.Sprintf("["+r.ServiceName+"] "+r.Probe.Name()+"at %.2f\n", probe))
+	log.Debugf("["+r.ServiceName+"] "+r.Probe.Name()+" at %.2f", probe)
 	if probe > 0.75 {
 		r.Scale.Up()
 	}
@@ -71,7 +70,7 @@ type FloatValue struct {
 // TODO proper error handling
 func (r FloatValue) Check() error {
 	probe := r.Probe.Value()
-	log.Debug(fmt.Sprintf("["+r.ServiceName+"] "+r.Probe.Name()+"at %.2f\n", probe))
+	log.Debugf("["+r.ServiceName+"] "+r.Probe.Name()+" at %.2f ", probe)
 	if r.Up(probe) && r.Down(probe) {
 		log.Warning("[" + r.ServiceName + "] try to scale up and down at the same time! (nothing done)")
 		return nil

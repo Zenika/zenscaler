@@ -105,7 +105,7 @@ var DumpConfigCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		_, err := parseConfig()
 		if err != nil {
-			log.Fatalf("Error in config file: %s \n", err)
+			log.Fatalf("Error in config file: %s", err)
 		}
 
 	},

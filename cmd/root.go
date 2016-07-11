@@ -36,19 +36,45 @@ func parseConfig() (*core.Config, error) {
 	viper.AddConfigPath(".")      // look for config in the working directory
 	err := viper.ReadInConfig()   // Find and read the config file
 	if err != nil {               // Handle errors reading the config file
-		log.Panicf("Fatal error in config file: %s \n", err)
+		return nil, fmt.Errorf("Cannot read config file: %s \n", err)
 	}
 
 	// global configuration structure
 	var config = &core.Config{
-		Rules: make([]rule.Rule, 0),
+		Scalers: make(map[string]scaler.Scaler, 5),
+		Rules:   make([]rule.Rule, 0),
 	}
+	// Parse scalers
+	var scalers = viper.Sub("scalers")
+	for _, name := range scalers.AllKeys() {
+		log.Info("Add scaler [" + name + "]")
+		var s = scalers.Sub(name)
+		switch s.GetString("type") {
+		case "docker-compose":
+			if s.GetString("config") == "" {
+				return nil, errors.New("No config specified for docker-compose scaler [" + name + "]")
+			}
+			if s.GetString("target") == "" {
+				return nil, errors.New("No target specified for docker-compose scaler [" + name + "]")
+			}
+			config.Scalers[name] = scaler.NewComposeScaler(s.GetString("target"), s.GetString("config"))
+		case "":
+			return nil, fmt.Errorf("Unknown scaler type: %s\n", s.GetString("type"))
+		}
+	}
+
 	// loop over the services
-	// create one default rule by service
 	rules := viper.Sub("rules")
 	for _, r := range rules.AllKeys() {
 		target := rules.Sub(r).GetString("target")
 		log.Info("Add service [" + target + "]")
+
+		// Check scaler
+		// TODO external function
+		scaler := rules.Sub(r).GetString("scaler")
+		if config.Scalers[scaler] == nil {
+			return nil, errors.New("No scaler specified for rule [" + r + "]")
+		}
 
 		// Parse rules
 		up, err := rule.Decode(rules.Sub(r).GetString("up"))
@@ -60,7 +86,7 @@ func parseConfig() (*core.Config, error) {
 			return nil, errors.New(target + fmt.Sprintf(": %v down", err))
 		}
 		config.Rules = append(config.Rules, rule.FloatValue{
-			Scale:       scaler.NewComposeScaler(target),
+			Scale:       config.Scalers[scaler], // TODO externalize
 			Probe:       &swarm.AverageCPU{Tag: target},
 			RefreshRate: rules.Sub(r).GetDuration("refresh"),
 			Up:          up,
@@ -79,7 +105,7 @@ var DumpConfigCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		_, err := parseConfig()
 		if err != nil {
-			log.Panicf("Fatal error in config file: %s \n", err)
+			log.Fatalf("Error in config file: %s \n", err)
 		}
 
 	},

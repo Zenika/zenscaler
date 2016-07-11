@@ -12,7 +12,7 @@ var StartCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		config, err := parseConfig()
 		if err != nil {
-			log.Panicf("Fatal error reading config file: %s \n", err)
+			log.Fatalf("Fatal error reading config file: %s \n", err)
 		}
 		config.Initialize()
 	},

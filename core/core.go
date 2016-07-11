@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"zscaler/core/rule"
+	"zscaler/core/scaler"
 
 	log "github.com/Sirupsen/logrus"
 )
@@ -13,6 +14,7 @@ const bufferSize = 10
 
 // Config holder
 type Config struct {
+	Scalers map[string]scaler.Scaler
 	Rules   []rule.Rule
 	errchan chan error
 }

@@ -1,14 +1,25 @@
 endpoint: "unix:///var/run/docker.sock"
+scalers:
+    whoami-compose:
+        type: "docker-compose"
+        target: "whoami"
+        config: "/home/maximilien/zenika/zscaler/deploy/swarm/docker-compose.yaml"
+    whoami2-compose:
+        type: "docker-compose"
+        target: "whoami2"
+        config: "/home/maximilien/zenika/zscaler/deploy/swarm/docker-compose.yaml"
 rules:
     whoami-cpu-scale:
         target: "whoami"
         probe: "cpudefault"
         up: "> 0.75"
         down: "< 0.25"
+        scaler: whoami-compose
         refresh: 3s
     whoami2-cpu-scale:
         target: "whoami2"
         probe: "cpudefault"
         up: "> 2"
         down: "< 1.5"
+        scaler: whoami2-compose
         refresh: 10s

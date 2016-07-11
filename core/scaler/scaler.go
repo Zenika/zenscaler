@@ -35,12 +35,13 @@ func (s *MockScaler) Down() error {
 }
 
 // NewComposeScaler buil a scaler
-func NewComposeScaler(name string) Scaler {
+func NewComposeScaler(name string, configFilePath string) Scaler {
 	// TODO need to gather containers, add an INIT ?
+	// TODO check for file at provided location
 	return &ComposeScaler{
 		serviceName:       name,
-		configFile:        "/home/maximilien/zenika/zscaler/deploy/swarm/docker-compose.yaml",
-		runningContainers: 3,
+		configFile:        configFilePath, // need check
+		runningContainers: 3,              // should be discovered
 	}
 }
 

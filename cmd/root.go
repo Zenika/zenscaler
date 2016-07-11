@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"zscaler/core"
 	"zscaler/core/rule"
+	"zscaler/core/scaler"
 	"zscaler/swarm"
 
 	log "github.com/Sirupsen/logrus"
@@ -59,7 +60,7 @@ func parseConfig() (*core.Config, error) {
 			return nil, errors.New(target + fmt.Sprintf(": %v down", err))
 		}
 		config.Rules = append(config.Rules, rule.FloatValue{
-			Scale:       rule.NewComposeScaler(target),
+			Scale:       scaler.NewComposeScaler(target),
 			Probe:       &swarm.AverageCPU{Tag: target},
 			RefreshRate: rules.Sub(r).GetDuration("refresh"),
 			Up:          up,

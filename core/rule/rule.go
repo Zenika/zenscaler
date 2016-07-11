@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 	"zscaler/core/probe"
+	"zscaler/core/scaler"
 
 	log "github.com/Sirupsen/logrus"
 )
@@ -33,7 +34,7 @@ func Watcher(c chan error, r Rule) {
 // Default provide a basic rule implementation
 type Default struct {
 	ServiceName string
-	Scale       Scaler
+	Scale       scaler.Scaler
 	Probe       probe.Probe
 	RefreshRate time.Duration
 }
@@ -59,7 +60,7 @@ func (r Default) CheckInterval() time.Duration {
 // FloatValue handler
 type FloatValue struct {
 	ServiceName string
-	Scale       Scaler
+	Scale       scaler.Scaler
 	Probe       probe.Probe
 	RefreshRate time.Duration
 	Up          func(v float64) bool

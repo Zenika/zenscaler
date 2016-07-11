@@ -68,6 +68,7 @@ type FloatValue struct {
 }
 
 // Check the probe, UP and DOWN
+// TODO proper error handling
 func (r FloatValue) Check() error {
 	probe := r.Probe.Value()
 	log.Debug(fmt.Sprintf("["+r.ServiceName+"] "+r.Probe.Name()+"at %.2f\n", probe))
@@ -76,10 +77,18 @@ func (r FloatValue) Check() error {
 		return nil
 	}
 	if r.Up(probe) {
-		r.Scale.Up()
+		err := r.Scale.Up()
+		if err != nil {
+			log.Errorf("Error when scaling up: %s", err)
+			return nil
+		}
 	}
 	if r.Down(probe) {
-		r.Scale.Down()
+		err := r.Scale.Down()
+		if err != nil {
+			log.Errorf("Error when scaling down: %s", err)
+			return nil
+		}
 	}
 	return nil
 }
@@ -92,7 +101,7 @@ func (r FloatValue) CheckInterval() time.Duration {
 // Decode a logical rule (ex. ">0.75")
 func Decode(order string) (func(float64) bool, error) {
 	// check syntax
-	regex := regexp.MustCompile("^[[:space:]]*([>|<|==|!=])[[:space:]]*([[:digit:]]*(?:\\.[[:digit:]]*)?)$")
+	regex := regexp.MustCompile(`^[[:space:]]*([>|<|==|!=])[[:space:]]*([[:digit:]]*(?:\.[[:digit:]]*)?)$`)
 	matches := regex.FindStringSubmatch(order)
 	if len(matches) == 3 {
 		value, err := strconv.ParseFloat(matches[2], 64)

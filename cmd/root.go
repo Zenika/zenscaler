@@ -77,6 +77,10 @@ var DumpConfigCmd = &cobra.Command{
 	Short: "Dump parsed config file to stdout",
 	Long:  `Check, parse and dump the configuration to the standart output`,
 	Run: func(cmd *cobra.Command, args []string) {
-		parseConfig()
+		_, err := parseConfig()
+		if err != nil {
+			log.Panicf("Fatal error in config file: %s \n", err)
+		}
+
 	},
 }

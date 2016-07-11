@@ -14,6 +14,9 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Debug switch
+var Debug bool
+
 // RootCmd is the defaut command
 var RootCmd = &cobra.Command{
 	Use:   "zscaler",
@@ -28,6 +31,7 @@ Complete documentation is available at https://github.com/zenika/zscaler/wiki`,
 func init() {
 	RootCmd.AddCommand(StartCmd)
 	RootCmd.AddCommand(DumpConfigCmd)
+	RootCmd.PersistentFlags().BoolVarP(&Debug, "debug", "d", false, "Activate debug output")
 }
 
 func parseConfig() (*core.Config, error) {

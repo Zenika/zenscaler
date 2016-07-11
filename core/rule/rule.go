@@ -32,26 +32,21 @@ func Watcher(c chan error, r Rule) {
 
 // Default provide a basic rule implementation
 type Default struct {
-	Target      Service
+	ServiceName string
+	Scale       Scaler
 	Probe       probe.Probe
 	RefreshRate time.Duration
-}
-
-// Service describes the object to scale
-type Service struct {
-	Name  string
-	Scale Scaler
 }
 
 // Check the probe, UP and DOWN at top and low quater
 func (r Default) Check() error {
 	probe := r.Probe.Value()
-	log.Debug(fmt.Sprintf("["+r.Target.Name+"] "+r.Probe.Name()+"at %.2f\n", probe))
+	log.Debug(fmt.Sprintf("["+r.ServiceName+"] "+r.Probe.Name()+"at %.2f\n", probe))
 	if probe > 0.75 {
-		r.Target.Scale.Up()
+		r.Scale.Up()
 	}
 	if probe < 0.25 {
-		r.Target.Scale.Down()
+		r.Scale.Down()
 	}
 	return nil
 }
@@ -63,7 +58,8 @@ func (r Default) CheckInterval() time.Duration {
 
 // FloatValue handler
 type FloatValue struct {
-	Target      Service
+	ServiceName string
+	Scale       Scaler
 	Probe       probe.Probe
 	RefreshRate time.Duration
 	Up          func(v float64) bool
@@ -73,16 +69,16 @@ type FloatValue struct {
 // Check the probe, UP and DOWN
 func (r FloatValue) Check() error {
 	probe := r.Probe.Value()
-	log.Debug(fmt.Sprintf("["+r.Target.Name+"] "+r.Probe.Name()+"at %.2f\n", probe))
+	log.Debug(fmt.Sprintf("["+r.ServiceName+"] "+r.Probe.Name()+"at %.2f\n", probe))
 	if r.Up(probe) && r.Down(probe) {
-		log.Warning("[" + r.Target.Name + "] try to scale up and down at the same time! (nothing done)")
+		log.Warning("[" + r.ServiceName + "] try to scale up and down at the same time! (nothing done)")
 		return nil
 	}
 	if r.Up(probe) {
-		r.Target.Scale.Up()
+		r.Scale.Up()
 	}
 	if r.Down(probe) {
-		r.Target.Scale.Down()
+		r.Scale.Down()
 	}
 	return nil
 }

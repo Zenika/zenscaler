@@ -37,7 +37,7 @@ func getAPI() Provider {
 // Check if service is started
 func (sp Provider) Check(rule rule.Default) bool {
 	// get the containers tagged with the service
-	containers := sp.getTag(rule.Target.Name)
+	containers := sp.getTag(rule.ServiceName)
 	return len(containers) > 0
 }
 

@@ -59,7 +59,7 @@ func parseConfig() (*core.Config, error) {
 			return nil, errors.New(target + fmt.Sprintf(": %v down", err))
 		}
 		config.Rules = append(config.Rules, rule.FloatValue{
-			Target:      rule.ComposeService(target),
+			Scale:       rule.NewComposeScaler(target),
 			Probe:       &swarm.AverageCPU{Tag: target},
 			RefreshRate: rules.Sub(r).GetDuration("refresh"),
 			Up:          up,

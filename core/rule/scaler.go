@@ -14,14 +14,6 @@ type Scaler interface {
 	Down() error
 }
 
-// MockService is a wrapper for the MockScaler
-func MockService(name string) Service {
-	return Service{
-		Name:  name,
-		Scale: new(MockScaler),
-	}
-}
-
 // MockScaler write "scale up" or "scale down" to stdout
 type MockScaler struct{}
 
@@ -42,15 +34,13 @@ func (s *MockScaler) Down() error {
 	return nil
 }
 
-// ComposeService create a new service
-func ComposeService(name string) Service {
-	return Service{
-		Name: name,
-		Scale: &ComposeScaler{
-			serviceName:       name,
-			configFile:        "/home/maximilien/zenika/zscaler/deploy/swarm/docker-compose.yaml",
-			runningContainers: 3,
-		},
+// NewComposeScaler buil a scaler
+func NewComposeScaler(name string) Scaler {
+	// TODO need to gather containers, add an INIT ?
+	return &ComposeScaler{
+		serviceName:       name,
+		configFile:        "/home/maximilien/zenika/zscaler/deploy/swarm/docker-compose.yaml",
+		runningContainers: 3,
 	}
 }
 

@@ -110,7 +110,7 @@ func parseConfig() (*core.Config, error) {
 			}
 			p = probe.HAproxy{
 				Socket: "/home/maximilien/zenika/haproxy/haproxy.stats",
-				Source: splittedProbe[1],
+				Type:   splittedProbe[1],
 				Item:   splittedProbe[2],
 			}
 		default:
@@ -118,6 +118,7 @@ func parseConfig() (*core.Config, error) {
 		}
 
 		config.Rules = append(config.Rules, rule.FloatValue{
+			ServiceName: target,
 			Scale:       config.Scalers[scaler], // TODO externalize
 			Probe:       p,
 			RefreshRate: rules.Sub(r).GetDuration("refresh"),

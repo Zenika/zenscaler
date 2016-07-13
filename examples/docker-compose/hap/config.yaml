@@ -3,7 +3,7 @@ scalers:
     dc-web:
         type: "docker-compose"
         target: "web"
-        config: "/home/maximilien/zenika/haproxy/docker-compose.yaml"
+        config: "docker-compose.yaml"
 rules:
     web-hap:
         target: "web"

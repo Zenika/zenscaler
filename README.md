@@ -12,7 +12,7 @@ Usage
 endpoint: "unix:///var/run/docker.sock"
 scalers:                               # scaler section
     whoami-compose:                    # custom id
-        type: "docker-compose"         # what do we use to scaler ?
+        type: "docker-compose"         # what do we use to scale the service ?
         target: "whoami"               # parameter for docker-compose
         config: "docker-compose.yaml"  # parameter for docker-compose
     whoami2-compose:

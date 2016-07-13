@@ -4,7 +4,9 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"zscaler/core"
+	"zscaler/core/probe"
 	"zscaler/core/rule"
 	"zscaler/core/scaler"
 	"zscaler/swarm"
@@ -89,9 +91,35 @@ func parseConfig() (*core.Config, error) {
 		if err != nil {
 			return nil, errors.New(target + fmt.Sprintf(": %v down", err))
 		}
+
+		// Pick probe
+		var p probe.Probe
+		refProbe := rules.Sub(r).GetString("probe")
+		splittedProbe := strings.Split(refProbe, ".")
+		if len(splittedProbe) < 2 {
+			return nil, errors.New("Badly formated probe: " + refProbe)
+		}
+		switch splittedProbe[0] {
+		case "swarm":
+			// handle swarm probe
+			p = &swarm.AverageCPU{Tag: target}
+		case "hap":
+			// HAproxy probes
+			if len(splittedProbe) != 3 {
+				return nil, errors.New("")
+			}
+			p = probe.HAproxy{
+				Socket: "/home/maximilien/zenika/haproxy/haproxy.stats",
+				Source: splittedProbe[1],
+				Item:   splittedProbe[2],
+			}
+		default:
+			return nil, errors.New("Unknown probe " + splittedProbe[0])
+		}
+
 		config.Rules = append(config.Rules, rule.FloatValue{
 			Scale:       config.Scalers[scaler], // TODO externalize
-			Probe:       &swarm.AverageCPU{Tag: target},
+			Probe:       p,
 			RefreshRate: rules.Sub(r).GetDuration("refresh"),
 			Up:          up,
 			Down:        down,

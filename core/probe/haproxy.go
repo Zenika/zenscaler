@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"strconv"
 	"strings"
 )
 
@@ -14,14 +15,31 @@ import (
 // Metrics are retrived by accessing HAProxy command socket
 type HAproxy struct {
 	Socket string
+	Type   string
 	Item   string
+}
+
+// Name of the probe
+func (ha HAproxy) Name() string {
+	return "HAproxy probe for " + ha.Type + "." + ha.Item
+}
+
+// Value probe the target and report back values
+func (ha HAproxy) Value() float64 {
+	statsMap, err := ha.getStats(ha.Type)
+	if err != nil {
+		// log it
+		return -1.0
+	}
+	value, _ := strconv.ParseFloat(statsMap[ha.Item][1], 64)
+	return value
 }
 
 // Some code from github.com/tnolet/haproxy-rest
 // See https://cbonte.github.io/haproxy-dconv/configuration-1.5.html#show%20stat
 // See https://www.datadoghq.com/blog/monitoring-haproxy-performance-metrics/
 // See https://cbonte.github.io/haproxy-dconv/configuration-1.5.html#9.1
-func (ha *HAproxy) getStats(statsType string) (map[string][]string, error) {
+func (ha HAproxy) getStats(statsType string) (map[string][]string, error) {
 	var cmdString string
 
 	switch statsType {

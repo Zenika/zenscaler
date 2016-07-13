@@ -10,18 +10,29 @@ Usage
 
 ```YAML
 endpoint: "unix:///var/run/docker.sock"
-rules:                      # rule section
-    whoami-cpu-scale:       # custom name of the service
-        target: "whoami"    # name of service as tagged in orchestrator
-        probe: "cpudefault" # probe to use
-        up: "> 0.75"        # up rule
-        down: "< 0.25"      # down rule
-        refresh: 3s         # scaler refresh rate
+scalers:                               # scaler section
+    whoami-compose:                    # custom id
+        type: "docker-compose"         # what do we use to scaler ?
+        target: "whoami"               # parameter for docker-compose
+        config: "docker-compose.yaml"  # parameter for docker-compose
+    whoami2-compose:
+        type: "docker-compose"
+        target: "whoami2"
+        config: "docker-compose.yaml"
+rules:                                 # rule section
+    whoami-cpu-scale:                  # custom name of the service
+        target: "whoami"               # name of service as tagged in orchestrator
+        probe: "swarm.cpu_average"     # probe to use
+        up: "> 0.75"                   # up rule
+        down: "< 0.25"                 # down rule
+        scaler: whoami-compose         # refer to any scaler id defined above
+        refresh: 3s                    # scaler refresh rate
     whoami2-cpu-scale:
         target: "whoami2"
-        probe: "cpudefault"
+        probe: "swarm.cpu_average"
         up: "> 2"
         down: "< 1.5"
+        scaler: whoami2-compose
         refresh: 10s
 ```
 
@@ -32,6 +43,8 @@ $ zscaler [command]
 Available Commands:
   dumpconfig  Dump parsed config file to stdout
   start       Start autoscaler
+Flags:
+  -d, --debug   Activate debug output
 ```
 
 Dependencies
@@ -50,7 +63,7 @@ Build it
 ```BASH
 make all
 ```
-This will download go dependency
+This will download go dependency and install the binary in `$GOPATH/bin`.
 
 Aside : Deploy on EC2
 -------------

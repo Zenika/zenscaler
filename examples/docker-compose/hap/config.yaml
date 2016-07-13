@@ -1,0 +1,14 @@
+endpoint: "unix:///var/run/docker.sock"
+scalers:
+    dc-web:
+        type: "docker-compose"
+        target: "web"
+        config: "/home/maximilien/zenika/haproxy/docker-compose.yaml"
+rules:
+    web-hap:
+        target: "web"
+        probe: "hap.backend.rtime"
+        up: "> 2"
+        down: "< 1"
+        scaler: dc-web
+        refresh: 0.5s

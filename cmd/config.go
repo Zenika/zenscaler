@@ -106,6 +106,10 @@ func parseConfig() (*core.Config, error) {
 				Type:   splittedProbe[1],
 				Item:   splittedProbe[2],
 			}
+		case "cmd":
+			p = &probe.Command{
+				Cmd: rules.Sub(r).GetString("cmd"),
+			}
 		default:
 			return nil, errors.New("Unknown probe " + splittedProbe[0])
 		}

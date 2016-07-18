@@ -8,6 +8,8 @@ import (
 
 func TestCommandProbe(t *testing.T) {
 	assert := assert.New(t)
-	cp := NewCommand("echo 0.15")
+	cp := &Command{
+		Cmd: "echo 0.15",
+	}
 	assert.Equal(0.15, cp.Value())
 }

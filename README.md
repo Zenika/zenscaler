@@ -8,6 +8,8 @@ Usage
 
 ### Configuration file
 
+Use-case configuration files can be found in the `examples` folder.
+
 ```YAML
 endpoint: "unix:///var/run/docker.sock"
 scalers:                               # scaler section

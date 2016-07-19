@@ -21,11 +21,12 @@ var DumpConfigCmd = &cobra.Command{
 	Short: "Dump parsed config file to stdout",
 	Long:  `Check, parse and dump the configuration to the standart output`,
 	Run: func(cmd *cobra.Command, args []string) {
-		_, err := parseConfig()
+		config, err := parseConfig()
 		if err != nil {
 			log.Fatalf("Error in config file: %s", err)
 		}
-
+		// TODO pretty output for config
+		fmt.Printf("%v", config)
 	},
 }
 
@@ -62,7 +63,7 @@ func parseConfig() (*core.Config, error) {
 		}
 	}
 
-	// loop over the services
+	// loop over the rules
 	rules := viper.Sub("rules")
 	for _, r := range rules.AllKeys() {
 		target := rules.Sub(r).GetString("target")

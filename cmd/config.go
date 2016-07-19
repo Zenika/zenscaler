@@ -50,7 +50,21 @@ func parseConfig() (*core.Config, error) {
 		return nil, fmt.Errorf("No endpoint specified")
 	}
 
-	// parse scalers
+	err = parseScalers(config)
+	if err != nil {
+		return nil, err
+	}
+
+	err = parseRules(config)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Info("Configuration complete !")
+	return config, nil
+}
+
+func parseScalers(config *core.Config) error {
 	var scalers = viper.Sub("scalers")
 	for _, name := range scalers.AllKeys() {
 		log.Info("Add scaler [" + name + "]")
@@ -58,26 +72,28 @@ func parseConfig() (*core.Config, error) {
 		switch s.GetString("type") {
 		case "docker-compose":
 			if s.GetString("config") == "" {
-				return nil, errors.New("No config specified for docker-compose scaler [" + name + "]")
+				return errors.New("No config specified for docker-compose scaler [" + name + "]")
 			}
 			if s.GetString("target") == "" {
-				return nil, errors.New("No target specified for docker-compose scaler [" + name + "]")
+				return errors.New("No target specified for docker-compose scaler [" + name + "]")
 			}
 			config.Scalers[name] = scaler.NewComposeScaler(s.GetString("target"), s.GetString("config"))
 		case "docker-service":
 			if s.GetString("service") == "" {
-				return nil, errors.New("No service specified for docker-service scaler [" + name + "]")
+				return errors.New("No service specified for docker-service scaler [" + name + "]")
 			}
 			config.Scalers[name] = &scaler.ServiceScaler{
 				ServiceID:    s.GetString("service"),
 				EngineSocket: viper.GetString("endpoint"),
 			}
 		case "":
-			return nil, fmt.Errorf("Unknown scaler type: %s\n", s.GetString("type"))
+			return fmt.Errorf("Unknown scaler type: %s\n", s.GetString("type"))
 		}
 	}
+	return nil
+}
 
-	// loop over the rules
+func parseRules(config *core.Config) error {
 	rules := viper.Sub("rules")
 	for _, r := range rules.AllKeys() {
 		target := rules.Sub(r).GetString("target")
@@ -87,48 +103,23 @@ func parseConfig() (*core.Config, error) {
 		// TODO external function
 		scaler := rules.Sub(r).GetString("scaler")
 		if config.Scalers[scaler] == nil {
-			return nil, errors.New("No scaler specified for rule [" + r + "]")
+			return errors.New("No scaler specified for rule [" + r + "]")
 		}
 
 		// parse rules
 		up, err := rule.Decode(rules.Sub(r).GetString("up"))
 		if err != nil {
-			return nil, errors.New(target + fmt.Sprintf(": %v up", err))
+			return errors.New(target + fmt.Sprintf(": %v up", err))
 		}
 		down, err := rule.Decode(rules.Sub(r).GetString("down"))
 		if err != nil {
-			return nil, errors.New(target + fmt.Sprintf(": %v down", err))
+			return errors.New(target + fmt.Sprintf(": %v down", err))
 		}
 
 		// pick probe
-		var p probe.Probe
-		refProbe := rules.Sub(r).GetString("probe")
-		splittedProbe := strings.Split(refProbe, ".")
-		if len(splittedProbe) < 2 {
-			return nil, errors.New("Badly formated probe: " + refProbe)
-		}
-		switch splittedProbe[0] {
-		case "swarm":
-			// handle swarm probe
-			p = &swarm.AverageCPU{Tag: target}
-		case "hap":
-			// HAproxy probes
-			if len(splittedProbe) != 3 {
-				return nil, errors.New("")
-			}
-			p = probe.HAproxy{
-				Socket: "/home/maximilien/zenika/haproxy/haproxy.stats",
-				Type:   splittedProbe[1],
-				Item:   splittedProbe[2],
-			}
-		case "cmd":
-			p = &probe.Command{
-				Cmd: rules.Sub(r).GetString("cmd"),
-			}
-		case "mock":
-			p = &probe.DefaultScalingProbe{}
-		default:
-			return nil, errors.New("Unknown probe " + splittedProbe[0])
+		p, err := parseProbe(config, r)
+		if err != nil {
+			return err
 		}
 
 		config.Rules = append(config.Rules, rule.FloatValue{
@@ -140,6 +131,41 @@ func parseConfig() (*core.Config, error) {
 			Down:        down,
 		})
 	}
-	log.Info("Configuration complete !")
-	return config, nil
+	return nil
+}
+
+func parseProbe(config *core.Config, r string) (p probe.Probe, err error) {
+	rules := viper.Sub("rules")
+	target := rules.Sub(r).GetString("target")
+
+	refProbe := rules.Sub(r).GetString("probe")
+	splittedProbe := strings.Split(refProbe, ".")
+	if len(splittedProbe) < 2 {
+		return nil, errors.New("Badly formated probe: " + refProbe)
+	}
+
+	switch splittedProbe[0] {
+	case "swarm":
+		// handle swarm probe
+		p = &swarm.AverageCPU{Tag: target}
+	case "hap":
+		// HAproxy probes
+		if len(splittedProbe) != 3 {
+			return nil, errors.New("hap probe need to be like hap.foo.bar")
+		}
+		p = probe.HAproxy{
+			Socket: "/home/maximilien/zenika/haproxy/haproxy.stats",
+			Type:   splittedProbe[1],
+			Item:   splittedProbe[2],
+		}
+	case "cmd":
+		p = &probe.Command{
+			Cmd: rules.Sub(r).GetString("cmd"),
+		}
+	case "mock":
+		p = &probe.DefaultScalingProbe{}
+	default:
+		return nil, errors.New("Unknown probe " + splittedProbe[0])
+	}
+	return p, nil
 }

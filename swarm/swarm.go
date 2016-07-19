@@ -3,7 +3,6 @@ package swarm
 import (
 	"encoding/json"
 	"time"
-	"zscaler/core/rule"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/docker/engine-api/client"
@@ -31,13 +30,6 @@ func getAPI() Provider {
 		provider = &Provider{cli: cli}
 	}
 	return *provider
-}
-
-// Check if service is started
-func (sp Provider) Check(rule rule.Default) bool {
-	// get the containers tagged with the service
-	containers := sp.getTag(rule.ServiceName)
-	return len(containers) > 0
 }
 
 func (sp Provider) getAll() []types.Container {

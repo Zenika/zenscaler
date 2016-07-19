@@ -30,32 +30,6 @@ func Watcher(c chan error, r Rule) {
 	}
 }
 
-// Default provide a basic rule implementation
-type Default struct {
-	ServiceName string
-	Scale       scaler.Scaler
-	Probe       probe.Probe
-	RefreshRate time.Duration
-}
-
-// Check the probe, UP and DOWN at top and low quater
-func (r Default) Check() error {
-	probe := r.Probe.Value()
-	log.Debugf("["+r.ServiceName+"] "+r.Probe.Name()+" at %.2f", probe)
-	if probe > 0.75 {
-		r.Scale.Up()
-	}
-	if probe < 0.25 {
-		r.Scale.Down()
-	}
-	return nil
-}
-
-// CheckInterval return the time to wait between each check
-func (r Default) CheckInterval() time.Duration {
-	return r.RefreshRate
-}
-
 // FloatValue handler
 type FloatValue struct {
 	ServiceName string

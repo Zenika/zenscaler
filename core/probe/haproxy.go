@@ -81,11 +81,11 @@ func (ha HAproxy) getStats(statsType string) (map[string][]string, error) {
 func (ha *HAproxy) HaproxyCmd(cmd string) (string, error) {
 	// connect to haproxy
 	conn, errConn := net.Dial("unix", ha.Socket)
-	defer conn.Close()
-
 	if errConn != nil {
 		return "", errors.New("Unable to connect to HAproxy socket")
 	}
+	defer func() { _ = conn.Close() }()
+
 	fmt.Fprint(conn, cmd)
 	response := ""
 	scanner := bufio.NewScanner(conn)

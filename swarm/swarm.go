@@ -21,7 +21,7 @@ type Provider struct {
 
 var provider *Provider
 
-// getAPI return a provider
+// getAPI return a lazy-initialized provider
 func getAPI() Provider {
 	if provider == nil {
 		defaultHeaders := map[string]string{"User-Agent": "engine-api-cli-1.0"}
@@ -71,11 +71,17 @@ func (sp Provider) getStats(cID string) *types.StatsJSON {
 	log.Debug("Get Stats for " + cID)
 	r, err := sp.cli.ContainerStats(ctx, cID, false)
 	if err != nil {
-		return nil
+		log.Errorf("%s", err)
 	}
 	var stats = new(types.StatsJSON)
-	json.NewDecoder(r).Decode(stats)
-	r.Close()
+	err = json.NewDecoder(r).Decode(stats)
+	if err != nil {
+		log.Errorf("%s", err)
+	}
+	err = r.Close()
+	if err != nil {
+		log.Errorf("%s", err)
+	}
 	return stats
 }
 
@@ -85,7 +91,10 @@ func (sp Provider) ScaleUp(tag string) error {
 	if len(containers) == 0 {
 		return errors.New("Cannot scale up: target [" + tag + "] not found")
 	}
-	sp.duplicateAndStart(containers[0].ID)
+	err := sp.duplicateAndStart(containers[0].ID)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

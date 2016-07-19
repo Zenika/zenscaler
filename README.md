@@ -1,14 +1,16 @@
 zScaler
 =======
 
-Zscaler aims to be an environement-agnostic, simple yet intelligent scaler. Target environements are Kubernetes, Rancher, Mesos and Swarm.
+zScaler aims to be an environement-agnostic, simple yet intelligent scaler.
+Target environements are Kubernetes, Rancher, Mesos and Swarm.
+Currently, the only supported target is the docker engine.
 
 Usage
 -----
 
 ### Configuration file
 
-Use-case configuration files can be found in the `examples` folder.
+Use-case configuration files can be found under the `examples/` folder.
 
 ```YAML
 endpoint: "unix:///var/run/docker.sock"
@@ -31,9 +33,10 @@ rules:                                 # rule section
         refresh: 3s                    # scaler refresh rate
     whoami2-cpu-scale:
         target: "whoami2"
-        probe: "swarm.cpu_average"
-        up: "> 2"
-        down: "< 1.5"
+        probe: "cmd.execute"           # probe can be any binary
+        cmd: "./some_script.sh"        # retrieve and write a float to stdout
+        up: "> 200"
+        down: "< 1.67"
         scaler: whoami2-compose
         refresh: 10s
 ```
@@ -52,7 +55,7 @@ Flags:
 Dependencies
 ------------
 
-You'll need Go (1.5+) and an orchestrator :
+You'll need Go (1.5+) and an orchestrator:
 * doker (api 1.22+) or docker-swarm
     * docker-compose (1.7.1) if you use it
 * kubernetes (_TBD_)

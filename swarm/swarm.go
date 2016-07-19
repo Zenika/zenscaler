@@ -2,7 +2,6 @@ package swarm
 
 import (
 	"encoding/json"
-	"errors"
 	"time"
 	"zscaler/core/rule"
 
@@ -83,59 +82,4 @@ func (sp Provider) getStats(cID string) *types.StatsJSON {
 		log.Errorf("%s", err)
 	}
 	return stats
-}
-
-// ScaleUp target service
-func (sp Provider) ScaleUp(tag string) error {
-	containers := sp.getTag(tag)
-	if len(containers) == 0 {
-		return errors.New("Cannot scale up: target [" + tag + "] not found")
-	}
-	err := sp.duplicateAndStart(containers[0].ID)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// duplicateAndStart specifier container
-func (sp Provider) duplicateAndStart(cID string) error {
-	// ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	// defer cancel()
-
-	// r, err = sp.cli.ContainerCreate(ctx, config, hostConfig, networkingConfig, containerName)
-	// if err != nil {
-	//	return err
-	// }
-	return nil
-}
-
-// ScaleDown target service
-func (sp Provider) ScaleDown(tag string) error {
-	return nil
-}
-
-// Scaler structure
-type Scaler struct {
-	service string
-}
-
-// Describe SwarmScaler
-func (s *Scaler) Describe() string {
-	return "Swarm scaler for docker"
-}
-
-// Up scale
-func (s *Scaler) Up() error {
-	// launch another instance of the same service
-	sp := getAPI()
-	sp.ScaleUp(s.service)
-	return nil
-}
-
-// Down scale
-func (s *Scaler) Down() error {
-	sp := getAPI()
-	sp.ScaleDown(s.service)
-	return nil
 }

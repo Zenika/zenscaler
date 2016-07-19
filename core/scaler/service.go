@@ -3,6 +3,7 @@ package scaler
 import (
 	"fmt"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/docker/engine-api/client"
 	"github.com/docker/engine-api/types"
 	"golang.org/x/net/context"
@@ -10,8 +11,8 @@ import (
 
 // ServiceScaler work with docker 1.12 swarm services (API 1.24)
 type ServiceScaler struct {
-	serviceID    string
-	engineSocket string
+	ServiceID    string
+	EngineSocket string
 	cli          *client.Client
 }
 
@@ -46,7 +47,7 @@ func (s *ServiceScaler) scaleService(scale func(uint64) uint64) error {
 		return err
 	}
 	ctx := context.Background()
-	service, _, err := cli.ServiceInspectWithRaw(ctx, s.serviceID)
+	service, _, err := cli.ServiceInspectWithRaw(ctx, s.ServiceID)
 	if err != nil {
 		return err
 	}
@@ -55,6 +56,7 @@ func (s *ServiceScaler) scaleService(scale func(uint64) uint64) error {
 		return fmt.Errorf("scale can only be used with replicated mode")
 	}
 	target := scale(*serviceMode.Replicated.Replicas)
+	log.Debugf("Scale "+s.ServiceID+" from %d to %d", *serviceMode.Replicated.Replicas, target)
 	serviceMode.Replicated.Replicas = &target
 
 	err = cli.ServiceUpdate(ctx, service.ID, service.Version, service.Spec, types.ServiceUpdateOptions{})
@@ -65,7 +67,7 @@ func (s *ServiceScaler) scaleService(scale func(uint64) uint64) error {
 func (s *ServiceScaler) getDocker() (cli *client.Client, err error) {
 	if s.cli == nil {
 		defaultHeaders := map[string]string{"User-Agent": "engine-api-cli-1.0"}
-		s.cli, err = client.NewClient(s.engineSocket, "v1.24", nil, defaultHeaders)
+		s.cli, err = client.NewClient(s.EngineSocket, "v1.24", nil, defaultHeaders)
 	}
 	return s.cli, err
 }

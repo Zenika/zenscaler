@@ -44,7 +44,13 @@ func parseConfig() (*core.Config, error) {
 		Scalers: make(map[string]scaler.Scaler, 5),
 		Rules:   make([]rule.Rule, 0),
 	}
-	// Parse scalers
+
+	// check endpoint
+	if viper.GetString("endpoint") == "" {
+		return nil, fmt.Errorf("No endpoint specified")
+	}
+
+	// parse scalers
 	var scalers = viper.Sub("scalers")
 	for _, name := range scalers.AllKeys() {
 		log.Info("Add scaler [" + name + "]")
@@ -58,6 +64,14 @@ func parseConfig() (*core.Config, error) {
 				return nil, errors.New("No target specified for docker-compose scaler [" + name + "]")
 			}
 			config.Scalers[name] = scaler.NewComposeScaler(s.GetString("target"), s.GetString("config"))
+		case "docker-service":
+			if s.GetString("service") == "" {
+				return nil, errors.New("No service specified for docker-service scaler [" + name + "]")
+			}
+			config.Scalers[name] = &scaler.ServiceScaler{
+				ServiceID:    s.GetString("service"),
+				EngineSocket: viper.GetString("endpoint"),
+			}
 		case "":
 			return nil, fmt.Errorf("Unknown scaler type: %s\n", s.GetString("type"))
 		}
@@ -69,14 +83,14 @@ func parseConfig() (*core.Config, error) {
 		target := rules.Sub(r).GetString("target")
 		log.Info("Add service [" + target + "]")
 
-		// Check scaler
+		// check scaler
 		// TODO external function
 		scaler := rules.Sub(r).GetString("scaler")
 		if config.Scalers[scaler] == nil {
 			return nil, errors.New("No scaler specified for rule [" + r + "]")
 		}
 
-		// Parse rules
+		// parse rules
 		up, err := rule.Decode(rules.Sub(r).GetString("up"))
 		if err != nil {
 			return nil, errors.New(target + fmt.Sprintf(": %v up", err))
@@ -86,7 +100,7 @@ func parseConfig() (*core.Config, error) {
 			return nil, errors.New(target + fmt.Sprintf(": %v down", err))
 		}
 
-		// Pick probe
+		// pick probe
 		var p probe.Probe
 		refProbe := rules.Sub(r).GetString("probe")
 		splittedProbe := strings.Split(refProbe, ".")
@@ -111,6 +125,8 @@ func parseConfig() (*core.Config, error) {
 			p = &probe.Command{
 				Cmd: rules.Sub(r).GetString("cmd"),
 			}
+		case "mock":
+			p = &probe.DefaultScalingProbe{}
 		default:
 			return nil, errors.New("Unknown probe " + splittedProbe[0])
 		}

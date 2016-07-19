@@ -1,0 +1,13 @@
+endpoint: "unix:///var/run/docker.sock"
+scalers:
+    helloworld:
+        type: "docker-service"
+        service: "helloworld"
+rules:
+    sin-scale:
+        target: "helloworld"
+        probe: "mock.default"
+        up: "> 0.5"
+        down: "< 0.5"
+        scaler: helloworld
+        refresh: 3s

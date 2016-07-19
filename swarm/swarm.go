@@ -2,9 +2,7 @@ package swarm
 
 import (
 	"encoding/json"
-	"errors"
 	"time"
-	"zscaler/core/rule"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/docker/engine-api/client"
@@ -21,7 +19,7 @@ type Provider struct {
 
 var provider *Provider
 
-// getAPI return a provider
+// getAPI return a lazy-initialized provider
 func getAPI() Provider {
 	if provider == nil {
 		defaultHeaders := map[string]string{"User-Agent": "engine-api-cli-1.0"}
@@ -32,13 +30,6 @@ func getAPI() Provider {
 		provider = &Provider{cli: cli}
 	}
 	return *provider
-}
-
-// Check if service is started
-func (sp Provider) Check(rule rule.Default) bool {
-	// get the containers tagged with the service
-	containers := sp.getTag(rule.ServiceName)
-	return len(containers) > 0
 }
 
 func (sp Provider) getAll() []types.Container {
@@ -71,62 +62,16 @@ func (sp Provider) getStats(cID string) *types.StatsJSON {
 	log.Debug("Get Stats for " + cID)
 	r, err := sp.cli.ContainerStats(ctx, cID, false)
 	if err != nil {
-		return nil
+		log.Errorf("%s", err)
 	}
 	var stats = new(types.StatsJSON)
-	json.NewDecoder(r).Decode(stats)
-	r.Close()
-	return stats
-}
-
-// ScaleUp target service
-func (sp Provider) ScaleUp(tag string) error {
-	containers := sp.getTag(tag)
-	if len(containers) == 0 {
-		return errors.New("Cannot scale up: target [" + tag + "] not found")
+	err = json.NewDecoder(r).Decode(stats)
+	if err != nil {
+		log.Errorf("%s", err)
 	}
-	sp.duplicateAndStart(containers[0].ID)
-	return nil
-}
-
-// duplicateAndStart specifier container
-func (sp Provider) duplicateAndStart(cID string) error {
-	// ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	// defer cancel()
-
-	// r, err = sp.cli.ContainerCreate(ctx, config, hostConfig, networkingConfig, containerName)
-	// if err != nil {
-	//	return err
-	// }
-	return nil
-}
-
-// ScaleDown target service
-func (sp Provider) ScaleDown(tag string) error {
-	return nil
-}
-
-// Scaler structure
-type Scaler struct {
-	service string
-}
-
-// Describe SwarmScaler
-func (s *Scaler) Describe() string {
-	return "Swarm scaler for docker"
-}
-
-// Up scale
-func (s *Scaler) Up() error {
-	// launch another instance of the same service
-	sp := getAPI()
-	sp.ScaleUp(s.service)
-	return nil
-}
-
-// Down scale
-func (s *Scaler) Down() error {
-	sp := getAPI()
-	sp.ScaleDown(s.service)
-	return nil
+	err = r.Close()
+	if err != nil {
+		log.Errorf("%s", err)
+	}
+	return stats
 }

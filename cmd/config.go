@@ -30,7 +30,7 @@ var DumpConfigCmd = &cobra.Command{
 	},
 }
 
-func parseConfig() (*core.Config, error) {
+func parseConfig() (*core.Configuration, error) {
 	// parse config file
 	viper.SetConfigName("config") // name of config file (without extension)
 	viper.AddConfigPath(".")      // look for config in the working directory
@@ -40,7 +40,7 @@ func parseConfig() (*core.Config, error) {
 	}
 
 	// global configuration structure
-	var config = &core.Config{
+	var config = &core.Configuration{
 		Scalers: make(map[string]scaler.Scaler, 5),
 		Rules:   make([]rule.Rule, 0),
 	}
@@ -64,7 +64,7 @@ func parseConfig() (*core.Config, error) {
 	return config, nil
 }
 
-func parseScalers(config *core.Config) error {
+func parseScalers(config *core.Configuration) error {
 	var scalers = viper.Sub("scalers")
 	for _, name := range scalers.AllKeys() {
 		log.Info("Add scaler [" + name + "]")
@@ -93,7 +93,7 @@ func parseScalers(config *core.Config) error {
 	return nil
 }
 
-func parseRules(config *core.Config) error {
+func parseRules(config *core.Configuration) error {
 	rules := viper.Sub("rules")
 	for _, r := range rules.AllKeys() {
 		target := rules.Sub(r).GetString("target")
@@ -134,7 +134,7 @@ func parseRules(config *core.Config) error {
 	return nil
 }
 
-func parseProbe(config *core.Config, r string) (p probe.Probe, err error) {
+func parseProbe(config *core.Configuration, r string) (p probe.Probe, err error) {
 	rules := viper.Sub("rules")
 	target := rules.Sub(r).GetString("target")
 

@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"zscaler/core"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -13,10 +15,11 @@ var StartCmd = &cobra.Command{
 		if Debug {
 			log.SetLevel(log.DebugLevel)
 		}
-		config, err := parseConfig()
+		var err error
+		core.Config, err = parseConfig()
 		if err != nil {
 			log.Fatalf("Fatal error reading config file: %s \n", err)
 		}
-		config.Initialize()
+		core.Config.Initialize()
 	},
 }

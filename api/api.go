@@ -1,23 +1,26 @@
 package api
 
-import "github.com/gin-gonic/gin"
+import (
+	log "github.com/Sirupsen/logrus"
+	"github.com/gin-gonic/gin"
+)
 
 // Start the API listener
-func Start() error {
+func Start() {
 	router := gin.Default()
 
 	v1 := router.Group("/v1")
 	v1.GET("/scalers", getScalers)
-	v1.PATCH("/scalers/:name", patchScalers)
-	v1.DELETE("/scalers/:name", deleteScalers)
+	v1.GET("/scalers/:name", getScaler)
+	v1.PATCH("/scalers/:name", patchScaler)
+	v1.DELETE("/scalers/:name", deleteScaler)
 
-	v1.GET("/rules", getRules)
-	v1.PATCH("/rules/:name", patchRules)
-	v1.DELETE("/rules/:name", deleteRules)
+	v1.GET("/rules/:name", getRule)
+	v1.PATCH("/rules/:name", patchRule)
+	v1.DELETE("/rules/:name", deleteRule)
 
 	err := router.Run(":3000")
 	if err != nil {
-		return err
+		log.Errorf("%s", err)
 	}
-	return nil
 }

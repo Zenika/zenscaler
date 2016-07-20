@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func getRules(c *gin.Context) {
+func getRule(c *gin.Context) {
 	name := c.Param("name")
 	// does this rule exist ?
 
@@ -15,10 +15,10 @@ func getRules(c *gin.Context) {
 	})
 }
 
-func patchRules(c *gin.Context) {
+func patchRule(c *gin.Context) {
 	c.String(http.StatusMethodNotAllowed, "Not implemented yet")
 }
 
-func deleteRules(c *gin.Context) {
+func deleteRule(c *gin.Context) {
 	c.String(http.StatusMethodNotAllowed, "Not implemented yet")
 }

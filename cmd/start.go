@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"zscaler/api"
 	"zscaler/core"
 
 	log "github.com/Sirupsen/logrus"
@@ -20,6 +21,7 @@ var StartCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Fatal error reading config file: %s \n", err)
 		}
+		go api.Start()
 		core.Config.Initialize()
 	},
 }

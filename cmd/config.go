@@ -15,6 +15,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+const defaultMapEnties = 5
+
 // DumpConfigCmd definition
 var DumpConfigCmd = &cobra.Command{
 	Use:   "dumpconfig",
@@ -41,8 +43,8 @@ func parseConfig() (*core.Configuration, error) {
 
 	// global configuration structure
 	var config = &core.Configuration{
-		Scalers: make(map[string]scaler.Scaler, 5),
-		Rules:   make([]rule.Rule, 0),
+		Scalers: make(map[string]scaler.Scaler, defaultMapEnties),
+		Rules:   make(map[string]rule.Rule, defaultMapEnties),
 	}
 
 	// check endpoint
@@ -122,14 +124,14 @@ func parseRules(config *core.Configuration) error {
 			return err
 		}
 
-		config.Rules = append(config.Rules, rule.FloatValue{
+		config.Rules[r] = rule.FloatValue{
 			ServiceName: target,
 			Scale:       config.Scalers[scaler], // TODO externalize
 			Probe:       p,
 			RefreshRate: rules.Sub(r).GetDuration("refresh"),
 			Up:          up,
 			Down:        down,
-		})
+		}
 	}
 	return nil
 }

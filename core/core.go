@@ -18,7 +18,7 @@ var Config *Configuration
 // Configuration holder
 type Configuration struct {
 	Scalers map[string]scaler.Scaler
-	Rules   []rule.Rule
+	Rules   map[string]rule.Rule
 	errchan chan error
 }
 

@@ -1,6 +1,7 @@
 package rule
 
 import (
+	"encoding/json"
 	"errors"
 	"regexp"
 	"strconv"
@@ -15,6 +16,7 @@ import (
 type Rule interface {
 	Check() error                 // performe a check on the target and act if needed
 	CheckInterval() time.Duration // time to wait between each check
+	JSON() ([]byte, error)        // return a JSON output
 }
 
 // Watcher check periodically the rule and report back errors
@@ -69,6 +71,15 @@ func (r FloatValue) Check() error {
 // CheckInterval return the time to wait between each check
 func (r FloatValue) CheckInterval() time.Duration {
 	return r.RefreshRate
+}
+
+// JSON encode
+func (r FloatValue) JSON() ([]byte, error) {
+	encoded, err := json.Marshal(r)
+	if err != nil {
+		return nil, err
+	}
+	return encoded, nil
 }
 
 // Decode a logical rule (ex. ">0.75")

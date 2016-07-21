@@ -15,6 +15,7 @@ func Start() {
 	v1.PATCH("/scalers/:name", patchScaler)
 	v1.DELETE("/scalers/:name", deleteScaler)
 
+	v1.GET("/rules", getRules)
 	v1.GET("/rules/:name", getRule)
 	v1.PATCH("/rules/:name", patchRule)
 	v1.DELETE("/rules/:name", deleteRule)

@@ -10,7 +10,7 @@ import (
 // getScalers list all configured scalers
 func getScalers(c *gin.Context) {
 	var scalerNames = make([]string, 0)
-	for k := range core.Config.Rules {
+	for k := range core.Config.Scalers {
 		scalerNames = append(scalerNames, k)
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -23,7 +23,11 @@ func getScaler(c *gin.Context) {
 	name := c.Param("name")
 	// does this scaler exist ?
 	if scaler, ok := core.Config.Scalers[name]; ok {
-		c.JSON(http.StatusOK, scaler)
+		encoded, err := scaler.JSON()
+		if err == nil {
+			c.Data(http.StatusOK, "application/json", encoded)
+			return
+		}
 	}
 	c.JSON(http.StatusNotFound, gin.H{
 		"error": name + " not found",

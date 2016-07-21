@@ -1,6 +1,7 @@
 package scaler
 
 import (
+	"encoding/json"
 	"fmt"
 
 	log "github.com/Sirupsen/logrus"
@@ -19,6 +20,15 @@ type ServiceScaler struct {
 // Describe scaler
 func (s *ServiceScaler) Describe() string {
 	return "Docker 1.12 swarm mode API scaler"
+}
+
+// JSON encode
+func (s *ServiceScaler) JSON() ([]byte, error) {
+	encoded, err := json.Marshal(s)
+	if err != nil {
+		return nil, err
+	}
+	return encoded, nil
 }
 
 // Up using API on swarm socket

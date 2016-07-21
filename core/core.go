@@ -12,21 +12,24 @@ import (
 
 const bufferSize = 10
 
-// Config holder
-type Config struct {
+// Config store the current running configuration
+var Config *Configuration
+
+// Configuration holder
+type Configuration struct {
 	Scalers map[string]scaler.Scaler
-	Rules   []rule.Rule
+	Rules   map[string]rule.Rule
 	errchan chan error
 }
 
 // Initialize core module
-func (c Config) Initialize() {
+func (c Configuration) Initialize() {
 	c.errchan = make(chan error, bufferSize)
 	c.loop()
 }
 
 // event loop
-func (c Config) loop() {
+func (c Configuration) loop() {
 	log.Debug("Enter control loop...")
 	// lanch a watcher on each rule
 	for _, r := range c.Rules {

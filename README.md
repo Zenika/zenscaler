@@ -52,18 +52,19 @@ Flags:
   -d, --debug   Activate debug output
 ```
 
-### API
+API
+---
 
 A REST API is available at startup, listening on `:3000`.
 
 URL                | Description
 -------------------|--------
 /v1/scalers        | List scalers
-/v1/scalers/<name> | Describe scalers
+/v1/scalers/:name  | Describe scalers
 /v1/rules          | List rules
-/v1/rules/<name>   | Describe rules
+/v1/rules/:name    | Describe rules
 
-#### Examples
+### Examples
 
 **Request** on `/v1/rules`
 
@@ -104,8 +105,8 @@ Date: Thu, 21 Jul 2016 09:46:45 GMT
 
 ```
 
-Dependencies
-------------
+Build it
+--------
 
 You'll need Go (1.5+) and an orchestrator:
 * doker (api 1.22+) or docker-swarm
@@ -113,14 +114,12 @@ You'll need Go (1.5+) and an orchestrator:
 * kubernetes (_TBD_)
 * Mesos (_TBD_)
 
-Build it
---------
 - Install Goalang and set you `$GOPATH`
 - Clone this repo in `$GOPATH/src` and do
 ```BASH
 make all
 ```
-This will download go dependency and install the binary in `$GOPATH/bin`.
+This will download all Go dependencies and install the binary in `$GOPATH/bin`.
 
 Aside : Deploy on EC2
 -------------

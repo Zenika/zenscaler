@@ -38,8 +38,8 @@ type FloatValue struct {
 	Scale       scaler.Scaler
 	Probe       probe.Probe
 	RefreshRate time.Duration
-	Up          func(v float64) bool
-	Down        func(v float64) bool
+	Up          func(v float64) bool `json:"-"`
+	Down        func(v float64) bool `json:"-"`
 }
 
 // Check the probe, UP and DOWN

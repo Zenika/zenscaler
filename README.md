@@ -52,6 +52,58 @@ Flags:
   -d, --debug   Activate debug output
 ```
 
+### API
+
+A REST API is available at startup, listening on `:3000`.
+
+URL                | Description
+-------------------|--------
+/v1/scalers        | List scalers
+/v1/scalers/<name> | Describe scalers
+/v1/rules          | List rules
+/v1/rules/<name>   | Describe rules
+
+#### Examples
+
+**Request** on `/v1/rules`
+
+```HTTP
+HTTP/1.1 200 OK
+Content-Length: 51
+Content-Type: application/json; charset=utf-8
+Date: Thu, 21 Jul 2016 07:52:42 GMT
+
+{
+    "rules": [
+        "whoami-cpu-scale",
+        "whoami2-cpu-scale"
+    ]
+}
+```
+
+**Request** on `/v1/rules/whoami-cpu-scale`
+
+```HTTP
+HTTP/1.1 200 OK
+Content-Length: 155
+Content-Type: application/json
+Date: Thu, 21 Jul 2016 09:46:45 GMT
+
+{
+    "Probe": {
+        "Cmd": "./traefik_rt.sh"
+    },
+    "RefreshRate": 3000000000,
+    "Scale": {
+        "config": "docker-compose.yaml",
+        "running": 1,
+        "service": "whoami"
+    },
+    "ServiceName": "whoami"
+}
+
+```
+
 Dependencies
 ------------
 

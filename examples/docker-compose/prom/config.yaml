@@ -1,0 +1,16 @@
+endpoint: "unix:///var/run/docker.sock"
+scalers:
+    whoami-compose:
+        type: "docker-compose"
+        target: "whoami"
+        config: "docker-compose.yaml"
+rules:
+    whoami-cpu-scale:
+        target: "whoami"
+        probe: "prom.http"
+        url: "http://localhost:9100/metrics"
+        key: 'node_cpu{cpu="cpu0",mode="idle"}'
+        up: "< 19200"
+        down: "> 5000"
+        scaler: whoami-compose
+        refresh: 3s

@@ -155,7 +155,7 @@ func parseProbe(config *core.Configuration, r string) (p probe.Probe, err error)
 		if len(splittedProbe) != 3 {
 			return nil, errors.New("hap probe need to be like hap.foo.bar")
 		}
-		p = probe.HAproxy{
+		p = &probe.HAproxy{
 			Socket: "/home/maximilien/zenika/haproxy/haproxy.stats",
 			Type:   splittedProbe[1],
 			Item:   splittedProbe[2],
@@ -163,6 +163,19 @@ func parseProbe(config *core.Configuration, r string) (p probe.Probe, err error)
 	case "cmd":
 		p = &probe.Command{
 			Cmd: rules.Sub(r).GetString("cmd"),
+		}
+	case "prom":
+		if splittedProbe[1] == "http" {
+			if rules.Sub(r).GetString("url") == "" {
+				return nil, errors.New("No url specified for Prometheus probe")
+			}
+			if rules.Sub(r).GetString("key") == "" {
+				return nil, errors.New("No url specified for Prometheus probe")
+			}
+			p = &probe.Prometheus{
+				URL: rules.Sub(r).GetString("url"),
+				Key: rules.Sub(r).GetString("key"),
+			}
 		}
 	case "mock":
 		p = &probe.DefaultScalingProbe{}

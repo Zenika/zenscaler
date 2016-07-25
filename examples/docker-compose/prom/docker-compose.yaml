@@ -1,0 +1,32 @@
+version: '2'
+
+services:
+ traefik:
+  image: traefik
+  command: --web --docker --docker.domain=docker.localhost --logLevel=DEBUG
+  networks:
+    - public
+  ports:
+    - "80:80"
+    - "8080:8080"
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - /dev/null:/traefik.toml
+
+ whoami:
+  image: emilevauge/whoami
+  networks:
+    - public
+  labels:
+    - "traefik.backend=whoami"
+    - "traefik.frontend.rule=Host:whoami.docker.localhost"
+
+ prom:
+  image: prom/node-exporter
+  networks:
+    - public
+  ports:
+    - "9100:9100"
+
+networks:
+ public:

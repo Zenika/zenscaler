@@ -12,6 +12,7 @@ import (
 // Prometheus probe
 //
 // Metrics are retrived using HTTP/Text protocol
+// (see https://prometheus.io/docs/instrumenting/exposition_formats/)
 // TODO protobuf support ?
 type Prometheus struct {
 	URL string // Sample: http://localhost:9100/metrics

@@ -28,7 +28,7 @@ func (ha HAproxy) Name() string {
 func (ha HAproxy) Value() float64 {
 	statsMap, err := ha.getStats(ha.Type)
 	if err != nil {
-		// log it
+		// TODO log it
 		return -1.0
 	}
 	value, _ := strconv.ParseFloat(statsMap[ha.Item][1], 64)

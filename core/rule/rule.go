@@ -43,9 +43,11 @@ type FloatValue struct {
 }
 
 // Check the probe, UP and DOWN
-// TODO proper error handling
 func (r FloatValue) Check() error {
-	probe := r.Probe.Value()
+	probe, err := r.Probe.Value()
+	if err != nil {
+		return err
+	}
 	log.Debugf("["+r.ServiceName+"] "+r.Probe.Name()+" at %.2f ", probe)
 	if r.Up(probe) && r.Down(probe) {
 		log.Warning("[" + r.ServiceName + "] try to scale up and down at the same time! (nothing done)")

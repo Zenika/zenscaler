@@ -13,7 +13,8 @@ func (info AverageCPU) Name() string {
 }
 
 // Value return average CPU consuption of all service containers
-func (info AverageCPU) Value() float64 {
+// TODO better error handling
+func (info AverageCPU) Value() (float64, error) {
 	sp := getAPI()
 	containers := sp.getTag(info.Tag)
 
@@ -27,7 +28,7 @@ func (info AverageCPU) Value() float64 {
 	for range containers {
 		cpusum = +<-reportCPU
 	}
-	return cpusum / float64(len(containers))
+	return cpusum / float64(len(containers)), nil
 }
 
 func calculateCPUPercent(v *types.StatsJSON) float64 {

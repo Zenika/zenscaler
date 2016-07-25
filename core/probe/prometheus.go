@@ -2,7 +2,6 @@ package probe
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -25,22 +24,19 @@ func (p Prometheus) Name() string {
 }
 
 // Value make the request and parse content
-func (p Prometheus) Value() float64 {
+func (p Prometheus) Value() (float64, error) {
 	resp, err := http.Get(p.URL)
 	if err != nil {
-		fmt.Printf("%s", err)
-		return -1.0
+		return -1.0, err
 	}
 	if resp.StatusCode != http.StatusOK {
-		fmt.Printf("%s", err)
-		return -1.0
+		return -1.0, err
 	}
 	fvalue, err := p.findValue(resp.Body)
 	if err != nil {
-		fmt.Printf("%s", err)
-		return -1.0
+		return -1.0, err
 	}
-	return fvalue
+	return fvalue, nil
 }
 
 // find the matching token and parse probe value
@@ -69,5 +65,5 @@ func (p Prometheus) findValue(body io.Reader) (float64, error) {
 
 		}
 	}
-	return 0, errors.New("Token " + p.Key + " not found")
+	return 0, fmt.Errorf("Token %s not found", p.Key)
 }

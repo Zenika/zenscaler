@@ -11,5 +11,9 @@ func TestCommandProbe(t *testing.T) {
 	cp := &Command{
 		Cmd: "echo 0.15",
 	}
-	assert.Equal(0.15, cp.Value())
+	val, err := cp.Value()
+	if err != nil {
+		t.Error(err)
+	}
+	assert.Equal(0.15, val)
 }

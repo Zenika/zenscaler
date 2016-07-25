@@ -53,5 +53,10 @@ func TestPrometheusGetValue(t *testing.T) {
 		URL: "http://localhost:9100/metrics",
 		Key: `node_sockstat_UDP_inuse`,
 	}
-	fmt.Printf("%f\n", p.Value())
+	val, err := p.Value()
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	fmt.Printf("%f\n", val)
 }

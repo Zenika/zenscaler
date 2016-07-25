@@ -25,14 +25,16 @@ func (ha HAproxy) Name() string {
 }
 
 // Value probe the target and report back values
-func (ha HAproxy) Value() float64 {
+func (ha HAproxy) Value() (float64, error) {
 	statsMap, err := ha.getStats(ha.Type)
 	if err != nil {
-		// TODO log it
-		return -1.0
+		return 0, fmt.Errorf("Cannot probe hap: %s", err)
 	}
-	value, _ := strconv.ParseFloat(statsMap[ha.Item][1], 64)
-	return value
+	value, err := strconv.ParseFloat(statsMap[ha.Item][1], 64)
+	if err != nil {
+		return 0, fmt.Errorf("Cannot parse float: %s", err)
+	}
+	return value, nil
 }
 
 // Some code from github.com/tnolet/haproxy-rest

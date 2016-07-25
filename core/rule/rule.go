@@ -3,6 +3,7 @@ package rule
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"regexp"
 	"strconv"
 	"time"
@@ -25,7 +26,7 @@ func Watcher(c chan error, r Rule) {
 	for {
 		err := r.Check()
 		if err != nil {
-			c <- err
+			c <- fmt.Errorf("Error checking probe: %s", err)
 			return
 		}
 		time.Sleep(r.CheckInterval())

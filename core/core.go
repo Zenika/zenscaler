@@ -2,8 +2,6 @@
 package core
 
 import (
-	"fmt"
-	"os"
 	"zscaler/core/rule"
 	"zscaler/core/scaler"
 
@@ -36,6 +34,10 @@ func (c Configuration) loop() {
 		go rule.Watcher(c.errchan, r)
 	}
 	// watch for errors
-	_ = fmt.Errorf("%s", <-c.errchan)
-	os.Exit(-1)
+	for {
+		err := <-c.errchan
+		if err != nil {
+			log.Fatalf("%s", err)
+		}
+	}
 }

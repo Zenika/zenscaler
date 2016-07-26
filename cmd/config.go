@@ -116,8 +116,10 @@ func parseRules(config *core.Configuration) error {
 
 		var floatValueRule = &rule.FloatValue{
 			ServiceName:    target,
-			Scale:          config.Scalers[scaler], // TODO externalize
+			Scale:          config.Scalers[scaler],
+			ScalerID:       scaler,
 			Probe:          p,
+			ProbeID:        rules.Sub(r).GetString("probe"),
 			RefreshRate:    rules.Sub(r).GetDuration("refresh"),
 			UpDefinition:   rules.Sub(r).GetString("up"),
 			DownDefinition: rules.Sub(r).GetString("down"),

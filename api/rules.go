@@ -38,6 +38,10 @@ func getRule(c *gin.Context) {
 	})
 }
 
+func createRule(c *gin.Context) {
+	c.String(http.StatusMethodNotAllowed, "Not implemented yet")
+}
+
 func patchRule(c *gin.Context) {
 	c.String(http.StatusMethodNotAllowed, "Not implemented yet")
 }

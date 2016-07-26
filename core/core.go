@@ -37,7 +37,7 @@ func (c Configuration) loop() {
 	for {
 		err := <-c.errchan
 		if err != nil {
-			log.Fatalf("%s", err)
+			log.Warningf("%s", err)
 		}
 	}
 }

@@ -15,8 +15,8 @@ import (
 // (see https://prometheus.io/docs/instrumenting/exposition_formats/)
 // TODO protobuf support ?
 type Prometheus struct {
-	URL string // Sample: http://localhost:9100/metrics
-	Key string // Sample: node_cpu{cpu="cpu6",mode="idle"}
+	URL string `json:"url"` // Sample: http://localhost:9100/metrics
+	Key string `json:"key"` // Sample: node_cpu{cpu="cpu6",mode="idle"}
 }
 
 // Name of the probe

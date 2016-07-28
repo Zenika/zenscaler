@@ -4,7 +4,7 @@ import "github.com/docker/engine-api/types"
 
 // AverageCPU probe of all containers
 type AverageCPU struct {
-	Tag string
+	Tag string `json:"tag"`
 }
 
 // Name of probe

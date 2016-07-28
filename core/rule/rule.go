@@ -35,11 +35,13 @@ func Watcher(c chan error, r Rule) {
 
 // FloatValue handler
 type FloatValue struct {
+	RuleName       string               `json:"rule"`
 	ServiceName    string               `json:"service"`
 	Scale          scaler.Scaler        `json:"-"`
 	ScalerID       string               `json:"scaler"`
 	Probe          probe.Probe          `json:"-"`
 	ProbeID        string               `json:"probe"`
+	ProbeArgs      json.RawMessage      `json:"probeArgs"`
 	RefreshRate    time.Duration        `json:"resfreshRate"`
 	UpDefinition   string               `json:"up"`
 	Up             func(v float64) bool `json:"-"`

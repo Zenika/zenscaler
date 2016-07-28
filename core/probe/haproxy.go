@@ -14,9 +14,9 @@ import (
 //
 // Metrics are retrived by accessing HAProxy command socket
 type HAproxy struct {
-	Socket string
-	Type   string
-	Item   string
+	Socket string `json:"socket"`
+	Type   string `json:"type"`
+	Item   string `json:"item"`
 }
 
 // Name of the probe

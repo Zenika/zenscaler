@@ -17,12 +17,12 @@ var Config *Configuration
 type Configuration struct {
 	Scalers map[string]scaler.Scaler
 	Rules   map[string]rule.Rule
-	errchan chan error
+	Errchan chan error
 }
 
 // Initialize core module
 func (c Configuration) Initialize() {
-	c.errchan = make(chan error, bufferSize)
+	c.Errchan = make(chan error, bufferSize)
 	c.loop()
 }
 
@@ -31,11 +31,11 @@ func (c Configuration) loop() {
 	log.Debug("Enter control loop...")
 	// lanch a watcher on each rule
 	for _, r := range c.Rules {
-		go rule.Watcher(c.errchan, r)
+		go rule.Watcher(c.Errchan, r)
 	}
 	// watch for errors
 	for {
-		err := <-c.errchan
+		err := <-c.Errchan
 		if err != nil {
 			log.Warningf("%s", err)
 		}

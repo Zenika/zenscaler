@@ -41,7 +41,6 @@ type FloatValue struct {
 	ScalerID       string               `json:"scaler"`
 	Probe          probe.Probe          `json:"-"`
 	ProbeID        string               `json:"probe"`
-	ProbeArgs      json.RawMessage      `json:"probeArgs"`
 	RefreshRate    time.Duration        `json:"resfreshRate"`
 	UpDefinition   string               `json:"up"`
 	Up             func(v float64) bool `json:"-"`

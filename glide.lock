@@ -1,0 +1,100 @@
+hash: c90d6d5d64cb847ae008f9e03f7f61b3700314073829349bf6b2879b76c4e21b
+updated: 2016-07-29T16:46:00.903245966+02:00
+imports:
+- name: github.com/BurntSushi/toml
+  version: 99064174e013895bbd9b025c31100bd1d9b590ca
+- name: github.com/docker/engine-api
+  version: 0df83fcc24fb4a997df5537526306fb55aa5dca8
+  subpackages:
+  - client
+  - types
+  - types/filters
+  - client/transport
+  - client/transport/cancellable
+  - types/container
+  - types/network
+  - types/registry
+  - types/time
+  - types/blkiodev
+  - types/strslice
+- name: github.com/docker/go-connections
+  version: 990a1a1a70b0da4c4cb70e117971a4f0babfbf1a
+  subpackages:
+  - sockets
+  - tlsconfig
+  - nat
+- name: github.com/docker/go-units
+  version: f2d77a61e3c169b43402a0a1e84f06daf29b8190
+- name: github.com/fsnotify/fsnotify
+  version: a8a77c9133d2d6fd8334f3260d06f60e8d80a5fb
+- name: github.com/gin-gonic/gin
+  version: e2fa89777e344782ef5d31929f095f4589c35dcc
+  subpackages:
+  - binding
+  - render
+- name: github.com/hashicorp/hcl
+  version: d8c773c4cba11b11539e3d45f93daeaa5dcf1fa1
+  subpackages:
+  - hcl/ast
+  - hcl/parser
+  - hcl/token
+  - json/parser
+  - hcl/scanner
+  - hcl/strconv
+  - json/scanner
+  - json/token
+- name: github.com/inconshreveable/mousetrap
+  version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
+- name: github.com/julienschmidt/httprouter
+  version: b428fda53bb0a764fea9c76c9413512eda291dec
+- name: github.com/magiconair/properties
+  version: b3f6dd549956e8a61ea4a686a1c02a33d5bdda4b
+- name: github.com/mattn/go-colorable
+  version: 9056b7a9f2d1f2d96498d6d146acd1f9d5ed3d59
+- name: github.com/mattn/go-isatty
+  version: 56b76bdf51f7708750eac80fa38b952bb9f32639
+- name: github.com/Microsoft/go-winio
+  version: ce2922f643c8fd76b46cadc7f404a06282678b34
+- name: github.com/mitchellh/mapstructure
+  version: 21a35fb16463dfb7c8eee579c65d995d95e64d1e
+- name: github.com/opencontainers/runc
+  version: 1a81e9ab1f138c091fe5c86d0883f87716088527
+  subpackages:
+  - libcontainer/user
+- name: github.com/Sirupsen/logrus
+  version: 4b6ea7319e214d98c938f12692336f7ca9348d6b
+- name: github.com/spf13/cast
+  version: 27b586b42e29bec072fe7379259cc719e1289da6
+- name: github.com/spf13/cobra
+  version: f62e98d28ab7ad31d707ba837a966378465c7b57
+- name: github.com/spf13/jwalterweatherman
+  version: 33c24e77fb80341fe7130ee7c594256ff08ccc46
+- name: github.com/spf13/pflag
+  version: 1560c1005499d61b80f865c04d39ca7505bf7f0b
+- name: github.com/spf13/viper
+  version: b53595fb56a492ecef90ee0457595a999eb6ec15
+- name: golang.org/x/net
+  version: 6a513affb38dc9788b449d59ffed099b8de18fa0
+  subpackages:
+  - context
+  - proxy
+- name: golang.org/x/sys
+  version: a646d33e2ee3172a661fc09bca23bb4889a41bc8
+  subpackages:
+  - unix
+  - windows
+- name: gopkg.in/yaml.v2
+  version: e4d366fc3c7938e2958e662b4258c7a89e1f0e3e
+testImports:
+- name: github.com/davecgh/go-spew
+  version: 2df174808ee097f90d259e432cc04442cf60be21
+  subpackages:
+  - spew
+- name: github.com/pmezard/go-difflib
+  version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
+  subpackages:
+  - difflib
+- name: github.com/stretchr/testify
+  version: f390dcf405f7b83c997eac1b06768bb9f44dec18
+  subpackages:
+  - assert

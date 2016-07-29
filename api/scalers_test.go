@@ -1,22 +1,15 @@
 package api
 
 import (
-	"encoding/json"
 	"testing"
-	"zscaler/core"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func configAndBuildScaler(t *testing.T, input string) error {
-	core.Config = MockConf
 	var sb ScalerBuilder
-	err := json.Unmarshal([]byte(input), &sb)
-	if err != nil {
-		t.Error(err)
-		t.FailNow()
-	}
-	_, err = sb.Build()
+	setupMockAndDecode(t, input, sb)
+	_, err := sb.Build()
 	return err
 }
 

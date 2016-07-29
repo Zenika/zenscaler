@@ -19,15 +19,18 @@ var MockConf = &core.Configuration{
 	Rules: map[string]rule.Rule{},
 }
 
-func configAndBuildRule(t *testing.T, input string) error {
+func setupMockAndDecode(t *testing.T, input string, target interface{}) {
 	core.Config = MockConf
-	var frb FloatValueBuilder
-	err := json.Unmarshal([]byte(input), &frb)
+	err := json.Unmarshal([]byte(input), &target)
 	if err != nil {
-		t.Error(err)
-		t.FailNow()
+		assert.FailNow(t, err.Error())
 	}
-	_, err = frb.Build()
+}
+
+func configAndBuildRule(t *testing.T, input string) error {
+	var frb FloatValueBuilder
+	setupMockAndDecode(t, input, frb)
+	_, err := frb.Build()
 	return err
 }
 

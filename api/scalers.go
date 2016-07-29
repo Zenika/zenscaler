@@ -35,13 +35,13 @@ func getScaler(c *gin.Context) {
 }
 
 func createScaler(c *gin.Context) {
-	c.String(http.StatusMethodNotAllowed, "Not implemented yet")
+	c.String(http.StatusNotImplemented, "Not implemented yet")
 }
 
 func patchScaler(c *gin.Context) {
-	c.String(http.StatusMethodNotAllowed, "Not implemented yet")
+	c.String(http.StatusNotImplemented, "Not implemented yet")
 }
 
 func deleteScaler(c *gin.Context) {
-	c.String(http.StatusMethodNotAllowed, "Not implemented yet")
+	c.String(http.StatusNotImplemented, "Not implemented yet")
 }

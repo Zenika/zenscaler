@@ -182,9 +182,9 @@ func (r *FloatValueBuilder) Build() (*rule.FloatValue, error) {
 }
 
 func patchRule(c *gin.Context) {
-	c.String(http.StatusMethodNotAllowed, "Not implemented yet")
+	c.String(http.StatusNotImplemented, "Not implemented yet")
 }
 
 func deleteRule(c *gin.Context) {
-	c.String(http.StatusMethodNotAllowed, "Not implemented yet")
+	c.String(http.StatusNotImplemented, "Not implemented yet")
 }

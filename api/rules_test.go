@@ -19,12 +19,15 @@ var MockConf = &core.Configuration{
 	Rules: map[string]rule.Rule{},
 }
 
-func configAndBuild(input string) error {
+func configAndBuild(t *testing.T, input string) error {
 	core.Config = MockConf
 	var frb FloatValueBuilder
-	json.Unmarshal([]byte(input), &frb)
-
-	_, err := frb.Build()
+	err := json.Unmarshal([]byte(input), &frb)
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	_, err = frb.Build()
 	return err
 }
 
@@ -41,7 +44,7 @@ func TestCreateComposeRuleSwarmProbe(t *testing.T) {
     "resfreshRate": 10000000000,
     "up": "> 2"
 }`
-	err := configAndBuild(input)
+	err := configAndBuild(t, input)
 	assert.Nil(t, err)
 }
 
@@ -58,7 +61,7 @@ func TestCreateComposeRuleMissingScaler(t *testing.T) {
     "resfreshRate": 10000000000,
     "up": "> 2"
 }`
-	err := configAndBuild(input)
+	err := configAndBuild(t, input)
 	assert.Error(t, err)
 }
 
@@ -72,7 +75,7 @@ func TestCreateComposeRuleMissingDockerProbeArgs(t *testing.T) {
     "resfreshRate": 10000000000,
     "up": "> 2"
 }`
-	err := configAndBuild(input)
+	err := configAndBuild(t, input)
 	assert.Error(t, err)
 }
 
@@ -86,6 +89,6 @@ func TestCreateComposeRuleBadProbe(t *testing.T) {
     "resfreshRate": 10000000000,
     "up": "> 2"
 }`
-	err := configAndBuild(input)
+	err := configAndBuild(t, input)
 	assert.Error(t, err)
 }

@@ -9,7 +9,7 @@ import (
 
 // Command probe allow the execution of any file or script and parse the output
 type Command struct {
-	Cmd string
+	Cmd string `json:"cmd"`
 }
 
 // Name of the probe

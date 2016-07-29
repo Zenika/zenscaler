@@ -35,16 +35,21 @@ func Watcher(c chan error, r Rule) {
 
 // FloatValue handler
 type FloatValue struct {
-	ServiceName string
-	Scale       scaler.Scaler
-	Probe       probe.Probe
-	RefreshRate time.Duration
-	Up          func(v float64) bool `json:"-"`
-	Down        func(v float64) bool `json:"-"`
+	RuleName       string               `json:"rule"`
+	ServiceName    string               `json:"service"`
+	Scale          scaler.Scaler        `json:"-"`
+	ScalerID       string               `json:"scaler"`
+	Probe          probe.Probe          `json:"-"`
+	ProbeID        string               `json:"probe"`
+	RefreshRate    time.Duration        `json:"resfreshRate"`
+	UpDefinition   string               `json:"up"`
+	Up             func(v float64) bool `json:"-"`
+	DownDefinition string               `json:"down"`
+	Down           func(v float64) bool `json:"-"`
 }
 
 // Check the probe, UP and DOWN
-func (r FloatValue) Check() error {
+func (r *FloatValue) Check() error {
 	probe, err := r.Probe.Value()
 	if err != nil {
 		return err
@@ -72,17 +77,30 @@ func (r FloatValue) Check() error {
 }
 
 // CheckInterval return the time to wait between each check
-func (r FloatValue) CheckInterval() time.Duration {
+func (r *FloatValue) CheckInterval() time.Duration {
 	return r.RefreshRate
 }
 
 // JSON encode
-func (r FloatValue) JSON() ([]byte, error) {
+func (r *FloatValue) JSON() ([]byte, error) {
 	encoded, err := json.Marshal(r)
 	if err != nil {
 		return nil, err
 	}
 	return encoded, nil
+}
+
+// Parse UpDefinition and DownDefinition directives to create matching functions
+func (r *FloatValue) Parse() (err error) {
+	r.Up, err = Decode(r.UpDefinition)
+	if err != nil {
+		return errors.New(r.ServiceName + fmt.Sprintf(": %v up", err))
+	}
+	r.Down, err = Decode(r.DownDefinition)
+	if err != nil {
+		return errors.New(r.ServiceName + fmt.Sprintf(": %v down", err))
+	}
+	return
 }
 
 // Decode a logical rule (ex. ">0.75")

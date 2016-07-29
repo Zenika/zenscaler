@@ -108,30 +108,28 @@ func parseRules(config *core.Configuration) error {
 			return errors.New("No scaler specified for rule [" + r + "]")
 		}
 
-		// parse rules
-		up, err := rule.Decode(rules.Sub(r).GetString("up"))
-		if err != nil {
-			return errors.New(target + fmt.Sprintf(": %v up", err))
-		}
-		down, err := rule.Decode(rules.Sub(r).GetString("down"))
-		if err != nil {
-			return errors.New(target + fmt.Sprintf(": %v down", err))
-		}
-
 		// pick probe
 		p, err := parseProbe(config, r)
 		if err != nil {
 			return err
 		}
 
-		config.Rules[r] = rule.FloatValue{
-			ServiceName: target,
-			Scale:       config.Scalers[scaler], // TODO externalize
-			Probe:       p,
-			RefreshRate: rules.Sub(r).GetDuration("refresh"),
-			Up:          up,
-			Down:        down,
+		var floatValueRule = &rule.FloatValue{
+			ServiceName:    target,
+			Scale:          config.Scalers[scaler],
+			ScalerID:       scaler,
+			Probe:          p,
+			ProbeID:        rules.Sub(r).GetString("probe"),
+			RefreshRate:    rules.Sub(r).GetDuration("refresh"),
+			UpDefinition:   rules.Sub(r).GetString("up"),
+			DownDefinition: rules.Sub(r).GetString("down"),
 		}
+		err = floatValueRule.Parse()
+		if err != nil {
+			return err
+		}
+		config.Rules[r] = floatValueRule
+		fmt.Printf("%v\n", config.Rules[r])
 	}
 	return nil
 }

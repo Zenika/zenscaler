@@ -57,23 +57,21 @@ API
 
 A REST API is available at startup, listening on `:3000`.
 
-URL                | Description
--------------------|--------
-/v1/scalers        | List scalers
-/v1/scalers/:name  | Describe scalers
-/v1/rules          | List rules
-/v1/rules/:name    | Describe rules
+URL                | HTTP verb | Description
+-------------------|-----------|------
+/v1/scalers        | GET       | List scalers
+/v1/scalers        | POST      | Create scaler
+/v1/scalers/:name  | GET       | Describe scalers
+/v1/rules          | GET       | List rules
+/v1/rules          | POST      | Create rule
+/v1/rules/:name    | GET       | Describe rules
 
 ### Examples
 
-**Request** on `/v1/rules`
+**Request** on `/v1/rules` return the following reponse:
 
 ```HTTP
 HTTP/1.1 200 OK
-Content-Length: 51
-Content-Type: application/json; charset=utf-8
-Date: Thu, 21 Jul 2016 07:52:42 GMT
-
 {
     "rules": [
         "whoami-cpu-scale",
@@ -82,14 +80,10 @@ Date: Thu, 21 Jul 2016 07:52:42 GMT
 }
 ```
 
-**Request** on `/v1/rules/whoami-cpu-scale`
+**Request** on `/v1/rules/whoami-cpu-scale` return the following reponse:
 
 ```HTTP
 HTTP/1.1 200 OK
-Content-Length: 155
-Content-Type: application/json
-Date: Thu, 21 Jul 2016 09:46:45 GMT
-
 {
     "Probe": {
         "Cmd": "./traefik_rt.sh"
@@ -103,6 +97,48 @@ Date: Thu, 21 Jul 2016 09:46:45 GMT
     "ServiceName": "whoami"
 }
 
+```
+
+#### Scaler creation
+
+```HTTP
+POST /v1/scalers HTTP/1.1
+{
+    "args": {
+        "config": "./examples/docker-compose/traefik/docker-compose.yaml",
+        "service": "whoami"
+    },
+    "name": "testing",
+    "type": "docker-compose"
+}
+
+HTTP/1.1 201 Created
+{
+    "scaler": "testing"
+}
+```
+
+#### Rule creation
+
+```HTTP
+POST /v1/rules HTTP/1.1
+{
+    "down": "< 1.5",
+    "probe": "swarm.cpu_average",
+    "probeArgs": {
+        "Tag": "whoami"
+    },
+    "resfreshRate": 10000000000,
+    "rule": "custom",
+    "scaler": "whoami-compose",
+    "service": "whoami",
+    "up": "> 2"
+}
+
+HTTP/1.1 201 Created
+{
+    "rule": "custom"
+}
 ```
 
 Build it

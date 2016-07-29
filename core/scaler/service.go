@@ -12,8 +12,8 @@ import (
 
 // ServiceScaler work with docker 1.12 swarm services (API 1.24)
 type ServiceScaler struct {
-	ServiceID    string
-	EngineSocket string
+	ServiceID    string `json:"service"`
+	EngineSocket string `json:"socket"`
 	cli          *client.Client
 }
 

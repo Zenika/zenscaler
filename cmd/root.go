@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const version = "v0.3-alpha"
+const version = "v0.4-alpha"
 
 // Debug switch
 var Debug bool

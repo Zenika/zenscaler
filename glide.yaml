@@ -1,15 +1,15 @@
-package: zscaler
+package: github.com/Zenika/zscaler
 import:
 - package: github.com/Sirupsen/logrus
   version: ^0.10.0
 - package: github.com/docker/engine-api
-  version: ^0.3.3
+  version: master
   subpackages:
   - client
   - types
   - types/filters
 - package: github.com/gin-gonic/gin
-  version: ^0.6.0
+  version: master
 - package: github.com/spf13/cobra
 - package: github.com/spf13/viper
 - package: golang.org/x/net

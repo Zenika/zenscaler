@@ -6,10 +6,11 @@ import (
 	"net/http"
 	"strings"
 	"time"
-	"zscaler/core"
-	"zscaler/core/probe"
-	"zscaler/core/rule"
-	"zscaler/swarm"
+
+	"github.com/Zenika/zscaler/core"
+	"github.com/Zenika/zscaler/core/probe"
+	"github.com/Zenika/zscaler/core/rule"
+	"github.com/Zenika/zscaler/swarm"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"

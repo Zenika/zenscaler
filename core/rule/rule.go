@@ -7,8 +7,9 @@ import (
 	"regexp"
 	"strconv"
 	"time"
-	"zscaler/core/probe"
-	"zscaler/core/scaler"
+
+	"github.com/Zenika/zscaler/core/probe"
+	"github.com/Zenika/zscaler/core/scaler"
 
 	log "github.com/Sirupsen/logrus"
 )

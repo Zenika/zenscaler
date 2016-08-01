@@ -2,7 +2,8 @@ package main
 
 import (
 	"os"
-	"zscaler/cmd"
+
+	"github.com/Zenika/zscaler/cmd"
 )
 
 func main() {

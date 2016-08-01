@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"zscaler/core"
-	"zscaler/core/scaler"
+
+	"github.com/Zenika/zscaler/core"
+	"github.com/Zenika/zscaler/core/scaler"
 
 	"github.com/gin-gonic/gin"
 )

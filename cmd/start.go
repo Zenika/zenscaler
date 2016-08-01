@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"zscaler/api"
-	"zscaler/core"
+	"github.com/Zenika/zscaler/api"
+	"github.com/Zenika/zscaler/core"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/spf13/cobra"

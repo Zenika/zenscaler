@@ -2,8 +2,8 @@
 package core
 
 import (
-	"zscaler/core/rule"
-	"zscaler/core/scaler"
+	"github.com/Zenika/zscaler/core/rule"
+	"github.com/Zenika/zscaler/core/scaler"
 
 	log "github.com/Sirupsen/logrus"
 )

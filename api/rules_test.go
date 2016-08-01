@@ -3,9 +3,10 @@ package api
 import (
 	"encoding/json"
 	"testing"
-	"zscaler/core"
-	"zscaler/core/rule"
-	"zscaler/core/scaler"
+
+	"github.com/Zenika/zscaler/core"
+	"github.com/Zenika/zscaler/core/rule"
+	"github.com/Zenika/zscaler/core/scaler"
 
 	"github.com/stretchr/testify/assert"
 )

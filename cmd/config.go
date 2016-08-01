@@ -4,11 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-	"zscaler/core"
-	"zscaler/core/probe"
-	"zscaler/core/rule"
-	"zscaler/core/scaler"
-	"zscaler/swarm"
+
+	"github.com/Zenika/zscaler/core"
+	"github.com/Zenika/zscaler/core/probe"
+	"github.com/Zenika/zscaler/core/rule"
+	"github.com/Zenika/zscaler/core/scaler"
+	"github.com/Zenika/zscaler/swarm"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/spf13/cobra"

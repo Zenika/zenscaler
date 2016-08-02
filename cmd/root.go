@@ -4,10 +4,9 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/Zenika/zscaler/core"
 	"github.com/spf13/cobra"
 )
-
-const version = "v0.4-alpha"
 
 // Debug switch
 var Debug bool
@@ -37,7 +36,7 @@ var VersionCmd = &cobra.Command{
 	Short: "Version number",
 	Long:  "Display version number and build informations",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("zScaler %s\n", version)
+		fmt.Printf("zScaler %s\n", core.Version)
 		return
 	},
 }

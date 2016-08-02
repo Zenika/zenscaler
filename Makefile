@@ -19,6 +19,8 @@ build:
 docker: docker-build docker-image
 docker-build:
 	docker build -t zscaler-build -f build.Dockerfile . ; \
-	docker run -v $(pwd)/build:/build -it zscaler-build go build -o /build/zscaler .
+	docker run -e "CGO_ENABLED=0" -e "GOGC=off" -v $$PWD/build:/build --rm zscaler-build go build --ldflags "-s -w -X github.com/Zenika/zscaler/core.Version=`git describe --tags`" -o /build/zscaler .
+
+
 docker-image:
-	docker build -t zscaler .
+	docker build --rm -t zscaler .

@@ -20,7 +20,6 @@ services:
   labels:
     - "traefik.backend=whoami"
     - "traefik.frontend.rule=Host:whoami.docker.localhost"
-  cpu_shares: 25
 
  whoami2:
   image: emilevauge/whoami
@@ -29,8 +28,17 @@ services:
   labels:
     - "traefik.backend=whoami2"
     - "traefik.frontend.rule=Host:whoami2.docker.localhost"
-  cpu_shares: 10
 
+ zscaler:
+  image: zscaler
+  command: -d start
+  networks:
+    - public
+  volumes:
+    - .:/app/config
+    - /var/run/docker.sock:/var/run/docker.sock
+  ports:
+    - "3000:3000"
 
 networks:
  public:

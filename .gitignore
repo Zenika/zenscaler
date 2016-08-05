@@ -5,3 +5,4 @@
 zscaler
 vendor/
 .glide/
+ec2.*

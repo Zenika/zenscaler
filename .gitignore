@@ -6,3 +6,4 @@ zscaler
 vendor/
 .glide/
 ec2.*
+*.out

@@ -89,7 +89,7 @@ func createScaler(c *gin.Context) {
 	// TODO check data race
 	if _, exist := core.Config.Scalers[sb.Name]; exist {
 		c.JSON(http.StatusConflict, gin.H{
-			"error": "A scaler named %s already exist" + err.Error(),
+			"error": "A scaler named" + sb.Name + "already exist",
 		})
 		return
 	}

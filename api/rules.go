@@ -131,7 +131,7 @@ func (r *FloatValueBuilder) Build() (*rule.FloatValue, error) {
 		}
 
 		var hp probe.HAproxy
-		err := json.Unmarshal(r.ProbeArgs, &hp)
+		err := json.Unmarshal(r.ProbeArgs, &hp) // only socket field is required
 		if err != nil {
 			return nil, fmt.Errorf("Badly formated JSON for HAproxy probe: %s", err)
 		}

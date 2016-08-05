@@ -162,6 +162,7 @@ func (r *FloatValueBuilder) Build() (*rule.FloatValue, error) {
 				return nil, fmt.Errorf("Missing Key in JSON for Prometheus probe")
 			}
 			fv.Probe = pp
+			break
 		}
 		return nil, fmt.Errorf("Bad prom encoding type (only http available)")
 	case "mock":

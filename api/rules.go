@@ -63,6 +63,12 @@ func createRule(c *gin.Context) {
 		return
 	}
 	// TODO check data race
+	if _, exist := core.Config.Rules[fvRule.RuleName]; exist {
+		c.JSON(http.StatusConflict, gin.H{
+			"error": "A rule named " + fvRule.RuleName + " already exist",
+		})
+		return
+	}
 	core.Config.Rules[fvRule.RuleName] = fvRule
 	go rule.Watcher(core.Config.Errchan, fvRule)
 
@@ -93,8 +99,8 @@ func (r *FloatValueBuilder) Build() (*rule.FloatValue, error) {
 	}
 
 	// fields related to map entries
-	if _, present := core.Config.Rules[r.RuleName]; present {
-		return nil, fmt.Errorf("Rule %s already exist", r.RuleName)
+	if r.RuleName == "" {
+		return nil, fmt.Errorf("No specified RuleName")
 	}
 	v, present := core.Config.Scalers[r.ScalerID]
 	if !present {

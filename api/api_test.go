@@ -128,6 +128,9 @@ func TestIntegration(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusCreated, res.StatusCode, string(body))
 
+	// query existing rule
+	res = getRequest(t, "v1/rules/cmd-rule")
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 	// query non-existing rule
 	res = getRequest(t, "v1/rules/not-found")
 	assert.Equal(t, http.StatusNotFound, res.StatusCode)

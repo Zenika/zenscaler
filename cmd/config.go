@@ -130,7 +130,6 @@ func parseRules(config *core.Configuration) error {
 			return err
 		}
 		config.Rules[r] = floatValueRule
-		fmt.Printf("%v\n", config.Rules[r])
 	}
 	return nil
 }
@@ -154,8 +153,11 @@ func parseProbe(config *core.Configuration, r string) (p probe.Probe, err error)
 		if len(splittedProbe) != 3 {
 			return nil, errors.New("hap probe need to be like hap.foo.bar")
 		}
+		if rules.Sub(r).GetString("ha-socket") == "" {
+			return nil, errors.New("No hap stat socket specified for " + r + " probe")
+		}
 		p = &probe.HAproxy{
-			Socket: "/home/maximilien/zenika/haproxy/haproxy.stats",
+			Socket: rules.Sub(r).GetString("ha-socket"),
 			Type:   splittedProbe[1],
 			Item:   splittedProbe[2],
 		}

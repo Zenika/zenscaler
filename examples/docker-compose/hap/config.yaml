@@ -8,6 +8,7 @@ rules:
     web-hap:
         target: "web"
         probe: "hap.backend.rtime"
+        ha-socket: "haproxy.stats"
         up: "> 2"
         down: "< 1"
         scaler: dc-web

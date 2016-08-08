@@ -7,7 +7,7 @@ import (
 
 func TestHAproxyRTimeProbe(t *testing.T) {
 	haprobe := &HAproxy{
-		Socket: "/home/maximilien/zenika/haproxy/haproxy.stats",
+		Socket: "haproxy.stats",
 		Type:   "backend",
 		Item:   "rtime",
 	}

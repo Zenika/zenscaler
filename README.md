@@ -10,7 +10,9 @@ Usage
 
 ### Configuration file
 
-Use-case configuration files can be found under the `examples/` folder.
+Please refer to the [wiki page](https://github.com/Zenika/zscaler/wiki/Configuration#configuration-file) for details.
+
+Use-case configuration files can be found under the `examples/` folder. Here's a sample:
 
 ```YAML
 endpoint: "unix:///var/run/docker.sock"
@@ -66,80 +68,6 @@ URL                | HTTP verb | Description
 /v1/rules          | POST      | Create rule
 /v1/rules/:name    | GET       | Describe rules
 
-### Examples
-
-**Request** on `/v1/rules` return the following reponse:
-
-```HTTP
-HTTP/1.1 200 OK
-{
-    "rules": [
-        "whoami-cpu-scale",
-        "whoami2-cpu-scale"
-    ]
-}
-```
-
-**Request** on `/v1/rules/whoami-cpu-scale` return the following reponse:
-
-```HTTP
-HTTP/1.1 200 OK
-{
-    "Probe": {
-        "Cmd": "./traefik_rt.sh"
-    },
-    "RefreshRate": 3000000000,
-    "Scale": {
-        "config": "docker-compose.yaml",
-        "running": 1,
-        "service": "whoami"
-    },
-    "ServiceName": "whoami"
-}
-
-```
-
-#### Scaler creation
-
-```HTTP
-POST /v1/scalers HTTP/1.1
-{
-    "args": {
-        "config": "./examples/docker-compose/traefik/docker-compose.yaml",
-        "service": "whoami"
-    },
-    "name": "testing",
-    "type": "docker-compose"
-}
-
-HTTP/1.1 201 Created
-{
-    "scaler": "testing"
-}
-```
-
-#### Rule creation
-
-```HTTP
-POST /v1/rules HTTP/1.1
-{
-    "down": "< 1.5",
-    "probe": "swarm.cpu_average",
-    "probeArgs": {
-        "Tag": "whoami"
-    },
-    "resfreshRate": 10000000000,
-    "rule": "custom",
-    "scaler": "whoami-compose",
-    "service": "whoami",
-    "up": "> 2"
-}
-
-HTTP/1.1 201 Created
-{
-    "rule": "custom"
-}
-```
 
 Build it
 --------
@@ -160,27 +88,6 @@ This will download all Go dependencies and install the binary in `$GOPATH/bin`.
 Aside : Deploy on EC2
 -------------
 
-You'll need:
-- `ansible 2.1+`
-- `docker  1.10.3 (API 1.22)`
-
-First export some parameters:
-```BASH
-export AWS_ACCESS_KEY_ID='ACME******'
-export AWS_SECRET_ACCESS_KEY='acme*************'
-export ANSIBLE_HOST_KEY_CHECKING=False
-```
-
-Provision swarm cluster:
-```BASH
-ansible-playbook aws-provision.yaml
-```
-
-Swarm socket is at `<master>:4000`, you can check it with `docker -H <master>:4000 info`.
-
-Disallocate cluster (using dynamic inventory)
-```BASH
-ansible-playbook -i ec2.py aws-terminate.yaml
-```
+Some ansible scripts where crafted ahead of development to bootstrap cluster deployment when needed. You can find them under the `deploy/` directory.
 
 _Project supported by Maximilien Richer, supervised by Sylvain Revereault (Zenika Rennes)_

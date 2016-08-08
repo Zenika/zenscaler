@@ -35,7 +35,7 @@ func configAndBuildRule(t *testing.T, input string) error {
 	return err
 }
 
-func TestCreateComposeRuleSwarmProbe(t *testing.T) {
+func TestBuildRuleSwarmProbe(t *testing.T) {
 	const input = `{
     "probe": "swarm.cpu_average",
     "rule": "custom",
@@ -52,7 +52,7 @@ func TestCreateComposeRuleSwarmProbe(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func TestCreateComposeRuleMissingScaler(t *testing.T) {
+func TestBuildRuleMissingScaler(t *testing.T) {
 	const input = `{
     "probe": "swarm.cpu_average",
     "rule": "custom",
@@ -69,7 +69,7 @@ func TestCreateComposeRuleMissingScaler(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func TestCreateComposeRuleMissingDockerProbeArgs(t *testing.T) {
+func TestBuildRuleMissingDockerProbeArgs(t *testing.T) {
 	const input = `{
     "probe": "swarm.cpu_average",
     "rule": "custom",
@@ -83,7 +83,7 @@ func TestCreateComposeRuleMissingDockerProbeArgs(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func TestCreateComposeRuleBadProbe(t *testing.T) {
+func TestBuildRuleBadProbeType(t *testing.T) {
 	const input = `{
     "probe": "bad.probe",
     "rule": "custom",
@@ -95,4 +95,111 @@ func TestCreateComposeRuleBadProbe(t *testing.T) {
 }`
 	err := configAndBuildRule(t, input)
 	assert.Error(t, err)
+}
+
+func TestBuildRuleBadProbeFormat(t *testing.T) {
+	const input = `{
+    "probe": "bad-format",
+    "rule": "custom",
+    "scaler": "whoami-compose",
+    "service": "whoami",
+    "down": "< 1.5",
+    "resfreshRate": 10000000000,
+    "up": "> 2"
+}`
+	err := configAndBuildRule(t, input)
+	assert.Error(t, err)
+}
+
+func TestBuildMissingServiceName(t *testing.T) {
+	const input = `{
+    "probe": "bad.probe",
+    "rule": "custom",
+    "scaler": "whoami-compose",
+    "down": "< 1.5",
+    "resfreshRate": 10000000000,
+    "up": "> 2"
+}`
+	err := configAndBuildRule(t, input)
+	assert.Error(t, err)
+}
+
+func TestBuildHapProbe(t *testing.T) {
+	const input = `{
+    "probe": "hap.backend.rtime",
+	"probeArgs": {
+		"socket": "dummy/uri/that/will/be/parsed/later"
+	},
+    "rule": "custom",
+	"service": "whoami",
+    "scaler": "whoami-compose",
+    "down": "< 1.5",
+    "resfreshRate": 10000000000,
+    "up": "> 2"
+}`
+	err := configAndBuildRule(t, input)
+	assert.Nil(t, err)
+}
+
+func TestBuildHapProbeDescriptionMissingEnd(t *testing.T) {
+	const input = `{
+    "probe": "hap.backend",
+    "rule": "custom",
+	"service": "whoami",
+    "scaler": "whoami-compose",
+    "down": "< 1.5",
+    "resfreshRate": 10000000000,
+    "up": "> 2"
+}`
+	err := configAndBuildRule(t, input)
+	assert.Error(t, err)
+}
+
+func TestBuildHapProbeNoArgs(t *testing.T) {
+	const input = `{
+    "probe": "hap.backend.rtime",
+    "rule": "custom",
+	"service": "whoami",
+    "scaler": "whoami-compose",
+    "down": "< 1.5",
+    "resfreshRate": 10000000000,
+    "up": "> 2"
+}`
+	err := configAndBuildRule(t, input)
+	assert.Error(t, err)
+}
+
+func TestBuildCmdProbe(t *testing.T) {
+	const input = `{
+    "probe": "cmd.execute",
+	"probeArgs": {
+		"cmd": "this-will-be-run-later"
+	},
+    "rule": "custom",
+	"service": "whoami",
+    "scaler": "whoami-compose",
+    "down": "< 1.5",
+    "resfreshRate": 10000000000,
+    "up": "> 2"
+}`
+	err := configAndBuildRule(t, input)
+	assert.Nil(t, err)
+}
+
+func TestBuildPromProbe(t *testing.T) {
+	const input = `{
+    "probe": "prom.http",
+	"probeArgs": {
+		"url": "http://localhost:9001/metrics",
+		"key": "node_sockstat_UDP_inuse"
+	},
+    "rule": "custom",
+	"service": "whoami",
+    "scaler": "whoami-compose",
+    "down": "< 1.5",
+    "resfreshRate": 10000000000,
+    "up": "> 2"
+}`
+	err := configAndBuildRule(t, input)
+	assert.Nil(t, err)
 }

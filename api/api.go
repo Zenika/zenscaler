@@ -5,6 +5,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var addrport = ":3000"
+
 // Start the API listener
 func Start() {
 	router := gin.Default()
@@ -22,7 +24,7 @@ func Start() {
 	v1.PATCH("/rules/:name", patchRule)
 	v1.DELETE("/rules/:name", deleteRule)
 
-	err := router.Run(":3000")
+	err := router.Run(addrport)
 	if err != nil {
 		log.Errorf("%s", err)
 	}

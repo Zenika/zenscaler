@@ -63,6 +63,12 @@ func createRule(c *gin.Context) {
 		return
 	}
 	// TODO check data race
+	if _, exist := core.Config.Rules[fvRule.RuleName]; exist {
+		c.JSON(http.StatusConflict, gin.H{
+			"error": "A rule named " + fvRule.RuleName + " already exist",
+		})
+		return
+	}
 	core.Config.Rules[fvRule.RuleName] = fvRule
 	go rule.Watcher(core.Config.Errchan, fvRule)
 
@@ -93,8 +99,8 @@ func (r *FloatValueBuilder) Build() (*rule.FloatValue, error) {
 	}
 
 	// fields related to map entries
-	if _, present := core.Config.Rules[r.RuleName]; present {
-		return nil, fmt.Errorf("Rule %s already exist", r.RuleName)
+	if r.RuleName == "" {
+		return nil, fmt.Errorf("No specified RuleName")
 	}
 	v, present := core.Config.Scalers[r.ScalerID]
 	if !present {
@@ -131,7 +137,7 @@ func (r *FloatValueBuilder) Build() (*rule.FloatValue, error) {
 		}
 
 		var hp probe.HAproxy
-		err := json.Unmarshal(r.ProbeArgs, &hp)
+		err := json.Unmarshal(r.ProbeArgs, &hp) // only socket field is required
 		if err != nil {
 			return nil, fmt.Errorf("Badly formated JSON for HAproxy probe: %s", err)
 		}
@@ -162,6 +168,7 @@ func (r *FloatValueBuilder) Build() (*rule.FloatValue, error) {
 				return nil, fmt.Errorf("Missing Key in JSON for Prometheus probe")
 			}
 			fv.Probe = pp
+			break
 		}
 		return nil, fmt.Errorf("Bad prom encoding type (only http available)")
 	case "mock":

@@ -1,8 +1,12 @@
 zScaler
 =======
 
-zscaler aims to be an environment-agnostic, simple and flexible scaler. It plugs itself on any existing infrastructure, probe metrics and scale services according to configured rules by issuing orders to orchestration engines.
+zScaler aims to be an environment-agnostic, simple and flexible scaler. It plugs itself on any existing infrastructure, probe metrics and scale services according to configured rules by issuing orders to orchestration engines.
 Currently, the only supported target is the docker engine.
+
+Requirements
+-----
+zScaler require Docker with docker-compose (>1.5) in your path or Docker 1.12 installed.
 
 Usage
 -----
@@ -49,6 +53,7 @@ $ zscaler [command]
 Available Commands:
   dumpconfig  Dump parsed config file to stdout
   start       Start autoscaler
+  version     Display version number
 Flags:
   -d, --debug   Activate debug output
 ```
@@ -71,18 +76,21 @@ URL                | HTTP verb | Description
 Build it
 --------
 
-You'll need Go (1.5+) and an orchestrator:
-* doker (api 1.22+) or docker-swarm
-    * docker-compose (1.7.1) if you use it
-* kubernetes (_TBD_)
-* Mesos (_TBD_)
-
+You'll need Go (1.5+).
 - Install Goalang and set you `$GOPATH`
-- Clone this repo in `$GOPATH/src` and do
+- Clone this repo in `$GOPATH/src/github.com/Zenika` and do
 ```BASH
 make all
 ```
 This will download all Go dependencies and install the binary in `$GOPATH/bin`.
+Du to the use of `net`, the resulting binary is not static.
+
+### Docker build and docker image
+If you have a docker engine, you can build zScaler inside a container and run it as a docker image. To do so run:
+```BASH
+make docker
+```
+The build image is tagged `zscaler-build` and the production image `zscaler`.
 
 Aside : Deploy on EC2
 -------------

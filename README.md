@@ -1,8 +1,7 @@
 zScaler
 =======
 
-zScaler aims to be an environement-agnostic, simple yet intelligent scaler.
-Target environements are Kubernetes, Rancher, Mesos and Swarm.
+zscaler aims to be an environment-agnostic, simple and flexible scaler. It plugs itself on any existing infrastructure, probe metrics and scale services according to configured rules by issuing orders to orchestration engines.
 Currently, the only supported target is the docker engine.
 
 Usage
@@ -10,7 +9,7 @@ Usage
 
 ### Configuration file
 
-Please refer to the [wiki page](https://github.com/Zenika/zscaler/wiki/Configuration#configuration-file) for details.
+Please refer to the dedicated [wiki page](https://github.com/Zenika/zscaler/wiki/Configuration#configuration-file) for details.
 
 Use-case configuration files can be found under the `examples/` folder. Here's a sample:
 

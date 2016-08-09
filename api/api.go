@@ -3,9 +3,8 @@ package api
 import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 )
-
-var addrport = ":3000"
 
 // Start the API listener
 func Start() {
@@ -24,7 +23,7 @@ func Start() {
 	v1.PATCH("/rules/:name", patchRule)
 	v1.DELETE("/rules/:name", deleteRule)
 
-	err := router.Run(addrport)
+	err := router.Run(viper.GetString("api-port"))
 	if err != nil {
 		log.Errorf("%s", err)
 	}

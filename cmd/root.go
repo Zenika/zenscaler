@@ -6,10 +6,8 @@ import (
 
 	"github.com/Zenika/zscaler/core"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
-
-// Debug switch
-var Debug bool
 
 // RootCmd is the defaut command
 var RootCmd = &cobra.Command{
@@ -28,6 +26,10 @@ func init() {
 	RootCmd.AddCommand(dumpConfigCmd)
 	RootCmd.AddCommand(versionCmd)
 	RootCmd.PersistentFlags().BoolP("debug", "d", false, "Activate debug output")
+	_ = viper.BindPFlag("debug", RootCmd.PersistentFlags().Lookup("debug"))
+
+	startCmd.Flags().String("api-port", ":3000", "API ")
+	_ = viper.BindPFlag("api-port", startCmd.Flags().Lookup("api-port"))
 }
 
 // VersionCmd display version number and informations

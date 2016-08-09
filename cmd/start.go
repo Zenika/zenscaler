@@ -7,6 +7,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // StartCmd parse configuration file and launch the scaler
@@ -14,7 +15,7 @@ var startCmd = &cobra.Command{
 	Use:   "start",
 	Short: "Start autoscaler",
 	Run: func(cmd *cobra.Command, args []string) {
-		if Debug {
+		if viper.GetBool("debug") {
 			log.SetLevel(log.DebugLevel)
 		} else {
 			gin.SetMode(gin.ReleaseMode)

@@ -83,7 +83,7 @@ You'll need Go (1.5+).
 make all
 ```
 This will download all Go dependencies and install the binary in `$GOPATH/bin`.
-Du to the use of `net`, the resulting binary is not static.
+Du to the use of `net`, the resulting binary is not statically linked.
 
 ### Docker build and docker image
 If you have a docker engine, you can build zScaler inside a container and run it as a docker image. To do so run:

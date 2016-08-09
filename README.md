@@ -6,7 +6,9 @@ Currently, the only supported target is the docker engine.
 
 Requirements
 -----
-zScaler require Docker with docker-compose (>1.5) in your path or Docker 1.12 installed.
+zScaler requires a docker engine to interact with and:
+- `docker-compose` scaler: `docker-compose` >1.5 (with `scale`) in your path
+- `docker-service` scaler: specified engine must be 1.12 (with `--replica`)
 
 Usage
 -----
@@ -61,7 +63,7 @@ Flags:
 API
 ---
 
-A REST API is available at startup, listening on `:3000`.
+A REST API is available at startup, listening on `:3000`. You can find examples on the [wiki page](https://github.com/Zenika/zscaler/wiki/API).
 
 URL                | HTTP verb | Description
 -------------------|-----------|------
@@ -76,14 +78,13 @@ URL                | HTTP verb | Description
 Build it
 --------
 
-You'll need Go (1.5+).
+You'll need Go 1.5 or above. Older version _may_ work but are still untested.
 - Install Goalang and set you `$GOPATH`
-- Clone this repo in `$GOPATH/src/github.com/Zenika` and do
+- Run `go get github.com/Zenika/zscaler` and do
 ```BASH
 make all
 ```
-This will download all Go dependencies and install the binary in `$GOPATH/bin`.
-Du to the use of `net`, the resulting binary is not statically linked.
+This will download all dependencies and install the binary in `$GOPATH/bin`.
 
 ### Docker build and docker image
 If you have a docker engine, you can build zScaler inside a container and run it as a docker image. To do so run:

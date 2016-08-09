@@ -19,7 +19,7 @@ import (
 const defaultMapEnties = 5
 
 // DumpConfigCmd definition
-var DumpConfigCmd = &cobra.Command{
+var dumpConfigCmd = &cobra.Command{
 	Use:   "dumpconfig",
 	Short: "Dump parsed config file to stdout",
 	Long:  `Check, parse and dump the configuration to the standart output`,

@@ -24,14 +24,14 @@ Complete documentation is available at https://github.com/zenika/zscaler/wiki`,
 }
 
 func init() {
-	RootCmd.AddCommand(StartCmd)
-	RootCmd.AddCommand(DumpConfigCmd)
-	RootCmd.AddCommand(VersionCmd)
-	RootCmd.PersistentFlags().BoolVarP(&Debug, "debug", "d", false, "Activate debug output")
+	RootCmd.AddCommand(startCmd)
+	RootCmd.AddCommand(dumpConfigCmd)
+	RootCmd.AddCommand(versionCmd)
+	RootCmd.PersistentFlags().BoolP("debug", "d", false, "Activate debug output")
 }
 
 // VersionCmd display version number and informations
-var VersionCmd = &cobra.Command{
+var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Version number",
 	Long:  "Display version number and build informations",

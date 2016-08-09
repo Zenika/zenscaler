@@ -10,7 +10,7 @@ import (
 )
 
 // StartCmd parse configuration file and launch the scaler
-var StartCmd = &cobra.Command{
+var startCmd = &cobra.Command{
 	Use:   "start",
 	Short: "Start autoscaler",
 	Run: func(cmd *cobra.Command, args []string) {

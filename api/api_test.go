@@ -10,6 +10,7 @@ import (
 	"github.com/Zenika/zscaler/core/rule"
 	"github.com/Zenika/zscaler/core/scaler"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -41,6 +42,8 @@ func TestIntegration(t *testing.T) {
 		Scalers: map[string]scaler.Scaler{},
 		Rules:   map[string]rule.Rule{},
 	}
+	viper.Set("api-port", ":3000")
+	viper.Set("allow-cmd-probe", true)
 	// start API server
 	go Start()
 

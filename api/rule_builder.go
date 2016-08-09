@@ -10,6 +10,7 @@ import (
 	"github.com/Zenika/zscaler/core/probe"
 	"github.com/Zenika/zscaler/core/rule"
 	"github.com/Zenika/zscaler/swarm"
+	"github.com/spf13/viper"
 )
 
 // FloatValueBuilder contains all the information to build a rule
@@ -151,6 +152,10 @@ func (builder *FloatValueBuilder) parseProbeSwarm(fv *rule.FloatValue) error {
 }
 
 func (builder *FloatValueBuilder) parseProbeCmd(fv *rule.FloatValue) (err error) {
+	if !viper.GetBool("allow-cmd-probe") {
+		return fmt.Errorf("Cannot create cmd probe using API if started without --allow-cmd-probe")
+	}
+
 	var cp probe.Command
 	err = json.Unmarshal(builder.ProbeArgs, &cp)
 	if err != nil {

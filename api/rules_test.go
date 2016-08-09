@@ -7,6 +7,7 @@ import (
 	"github.com/Zenika/zscaler/core"
 	"github.com/Zenika/zscaler/core/rule"
 	"github.com/Zenika/zscaler/core/scaler"
+	"github.com/spf13/viper"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -182,8 +183,12 @@ func TestBuildCmdProbe(t *testing.T) {
     "resfreshRate": 10000000000,
     "up": "> 2"
 }`
+	viper.Set("allow-cmd-probe", true)
 	err := configAndBuildRule(t, input)
 	assert.Nil(t, err)
+	viper.Set("allow-cmd-probe", false)
+	err = configAndBuildRule(t, input)
+	assert.Error(t, err)
 }
 
 func TestBuildPromProbe(t *testing.T) {

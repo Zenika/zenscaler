@@ -28,8 +28,10 @@ func init() {
 	RootCmd.PersistentFlags().BoolP("debug", "d", false, "Activate debug output")
 	_ = viper.BindPFlag("debug", RootCmd.PersistentFlags().Lookup("debug"))
 
-	startCmd.Flags().String("api-port", ":3000", "API ")
+	startCmd.Flags().StringP("api-port", "l", ":3000", "API listening address and port")
 	_ = viper.BindPFlag("api-port", startCmd.Flags().Lookup("api-port"))
+	startCmd.Flags().Bool("allow-cmd-probe", false, "Allow the use of cmd probe over the API")
+	_ = viper.BindPFlag("allow-cmd-probe", startCmd.Flags().Lookup("allow-cmd-probe"))
 }
 
 // VersionCmd display version number and informations

@@ -150,38 +150,47 @@ func parseProbe(config *core.Configuration, r string) (p probe.Probe, err error)
 		p = &swarm.AverageCPU{Tag: target}
 	case "hap":
 		// HAproxy probes
-		if len(splittedProbe) != 3 {
-			return nil, errors.New("hap probe need to be like hap.foo.bar")
-		}
-		if rules.Sub(r).GetString("ha-socket") == "" {
-			return nil, errors.New("No hap stat socket specified for " + r + " probe")
-		}
-		p = &probe.HAproxy{
-			Socket: rules.Sub(r).GetString("ha-socket"),
-			Type:   splittedProbe[1],
-			Item:   splittedProbe[2],
-		}
+		p, err = parseProbeHAP(rules, r, splittedProbe)
 	case "cmd":
 		p = &probe.Command{
 			Cmd: rules.Sub(r).GetString("cmd"),
 		}
 	case "prom":
-		if splittedProbe[1] == "http" {
-			if rules.Sub(r).GetString("url") == "" {
-				return nil, errors.New("No url specified for Prometheus probe")
-			}
-			if rules.Sub(r).GetString("key") == "" {
-				return nil, errors.New("No url specified for Prometheus probe")
-			}
-			p = &probe.Prometheus{
-				URL: rules.Sub(r).GetString("url"),
-				Key: rules.Sub(r).GetString("key"),
-			}
-		}
+		p, err = parseProbeProm(rules, r, splittedProbe)
 	case "mock":
 		p = &probe.DefaultScalingProbe{}
 	default:
 		return nil, errors.New("Unknown probe " + splittedProbe[0])
 	}
 	return p, nil
+}
+
+func parseProbeHAP(rules *viper.Viper, r string, splittedProbe []string) (probe.Probe, error) {
+	if len(splittedProbe) != 3 {
+		return nil, errors.New("hap probe need to be like hap.foo.bar")
+	}
+	if rules.Sub(r).GetString("ha-socket") == "" {
+		return nil, errors.New("No hap stat socket specified for " + r + " probe")
+	}
+	return &probe.HAproxy{
+		Socket: rules.Sub(r).GetString("ha-socket"),
+		Type:   splittedProbe[1],
+		Item:   splittedProbe[2],
+	}, nil
+}
+
+func parseProbeProm(rules *viper.Viper, r string, splittedProbe []string) (probe.Probe, error) {
+	if splittedProbe[1] == "http" {
+		if rules.Sub(r).GetString("url") == "" {
+			return nil, errors.New("No url specified for Prometheus probe")
+		}
+		if rules.Sub(r).GetString("key") == "" {
+			return nil, errors.New("No url specified for Prometheus probe")
+		}
+		return &probe.Prometheus{
+			URL: rules.Sub(r).GetString("url"),
+			Key: rules.Sub(r).GetString("key"),
+		}, nil
+	}
+	return nil, fmt.Errorf("Unknow prometheus probe type \"%s\"", splittedProbe[1])
 }

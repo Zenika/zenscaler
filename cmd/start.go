@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/Zenika/zscaler/api"
 	"github.com/Zenika/zscaler/core"
+	"github.com/gin-gonic/gin"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -15,6 +16,8 @@ var StartCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		if Debug {
 			log.SetLevel(log.DebugLevel)
+		} else {
+			gin.SetMode(gin.ReleaseMode)
 		}
 		var err error
 		core.Config, err = parseConfig()

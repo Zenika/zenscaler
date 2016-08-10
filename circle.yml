@@ -1,0 +1,25 @@
+# CircleCI file
+# see https://circleci.com/docs/language-go/
+
+machine:
+    services:
+        - docker
+
+dependencies:
+    pre:
+        - go get -u github.com/alecthomas/gometalinter
+    override:
+        - go get -v -d -t ./...
+        - go build --ldflags "-s -w -X github.com/Zenika/zscaler/core.Version=`git describe --tags --always`" .:
+            environment:
+                CGO_ENABLED: 0
+                GOGC: "off"
+        - go install:
+            pwd: ../.go_workspace/src/github.com/Zenika/zscaler
+    post:
+        - gometalinter --install --vendor
+
+test:
+    override:
+        - go test -race -v -cover -timeout 120s ./api
+        - gometalinter -j4 --deadline 300s ./...

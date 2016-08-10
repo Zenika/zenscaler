@@ -1,4 +1,9 @@
-endpoint: "unix:///var/run/docker.sock"
+orchestrator:
+    kind: "docker"
+    endpoint: "localhost:2376"
+    tls-cacert: "/home/maximilien/docker/ca.pem"
+    tls-cert: "/home/maximilien/docker/cert.pem"
+    tls-key: "/home/maximilien/docker/key.pem"
 scalers:
     whoami-compose:
         type: "docker-compose"

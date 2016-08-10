@@ -48,9 +48,9 @@ func parseConfig() (*core.Configuration, error) {
 		Rules:   make(map[string]rule.Rule, defaultMapEnties),
 	}
 
-	// check endpoint
-	if viper.GetString("endpoint") == "" {
-		return nil, fmt.Errorf("No endpoint specified")
+	err = parseOrchestrator(config)
+	if err != nil {
+		return nil, err
 	}
 
 	err = parseScalers(config)
@@ -65,6 +65,26 @@ func parseConfig() (*core.Configuration, error) {
 
 	log.Info("Configuration complete !")
 	return config, nil
+}
+
+func parseOrchestrator(config *core.Configuration) error {
+	sub := viper.Sub("orchestrator")
+	if sub == nil {
+		return fmt.Errorf("Orchestrator section missing!")
+	}
+	config.Orchestrator = core.OrchestratorConfig{
+		Kind:          sub.GetString("type"),
+		Endpoint:      sub.GetString("endpoint"),
+		TLSCACertPath: sub.GetString("tls-cacert"),
+		TLSCertPath:   sub.GetString("tls-cert"),
+		TLSKeyPath:    sub.GetString("tls-key"),
+	}
+	// check endpoint
+	if config.Orchestrator.Endpoint == "" {
+		return fmt.Errorf("No endpoint specified")
+	}
+	// check TLS requirements
+	return config.Orchestrator.CheckTLS()
 }
 
 func parseScalers(config *core.Configuration) error {

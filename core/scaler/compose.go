@@ -42,6 +42,7 @@ func (s *ComposeScaler) JSON() ([]byte, error) {
 
 // Up using doker compose scale
 func (s *ComposeScaler) Up() error {
+	// #nosec TODO replace with libcompose API
 	upCmd := exec.Command("docker-compose", "-f", s.ConfigFile, "scale", s.ServiceName+"="+strconv.Itoa(s.RunningContainers+1))
 	log.Infof("Scale "+s.ServiceName+" up to %d", s.RunningContainers+1)
 	out, err := upCmd.CombinedOutput()
@@ -59,6 +60,7 @@ func (s *ComposeScaler) Down() error {
 		log.Debug("Cannot scale down below one container")
 		return nil
 	}
+	// #nosec TODO replace with libcompose API
 	downCmd := exec.Command("docker-compose", "-f", s.ConfigFile, "scale", s.ServiceName+"="+strconv.Itoa(s.RunningContainers-1))
 	log.Infof("Scale "+s.ServiceName+" down to %d", s.RunningContainers-1)
 	out, err := downCmd.CombinedOutput()

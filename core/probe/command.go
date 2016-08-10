@@ -31,6 +31,7 @@ func (cp Command) Value() (float64, error) {
 }
 
 // NewCommand from string cut executable and args
+// #nosec
 func (cp Command) newCommand() *exec.Cmd {
 	splitted := strings.Split(cp.Cmd, " ")
 	return exec.Command(splitted[0], splitted[1:]...)

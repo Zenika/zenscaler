@@ -86,6 +86,7 @@ func (ha *HAproxy) HaproxyCmd(cmd string) (string, error) {
 	if errConn != nil {
 		return "", fmt.Errorf("Unable to connect to HAproxy socket: %s", errConn)
 	}
+	// #nosec close unix socket, no information written
 	defer func() { _ = conn.Close() }()
 
 	fmt.Fprint(conn, cmd)

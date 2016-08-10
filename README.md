@@ -1,6 +1,8 @@
 zScaler
 =======
 
+[![CircleCI](https://circleci.com/gh/Zenika/zscaler/tree/master.svg?style=svg&circle-token=78b4c3db440a574eea374cc602addd51a6b5e249)](https://circleci.com/gh/Zenika/zscaler/tree/master)
+
 zScaler aims to be an environment-agnostic, simple and flexible scaler. It plugs itself on any existing infrastructure, probe metrics and scale services according to configured rules by issuing orders to orchestration engines.
 Currently, the only supported target is the docker engine.
 

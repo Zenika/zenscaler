@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Zenika/zscaler/core"
 	"github.com/Zenika/zscaler/core/probe"
 	"github.com/Zenika/zscaler/core/rule"
 	"github.com/Zenika/zscaler/core/scaler"
+	"github.com/Zenika/zscaler/core/tls"
 	"github.com/Zenika/zscaler/core/types"
 	"github.com/Zenika/zscaler/swarm"
 
@@ -85,8 +85,7 @@ func parseOrchestrator(config *types.Configuration) error {
 		return fmt.Errorf("No endpoint specified")
 	}
 	// check TLS requirements
-	_, err := core.CheckTLS()
-	return err
+	return tls.CheckTLS()
 }
 
 func parseScalers(config *types.Configuration) error {
@@ -102,7 +101,11 @@ func parseScalers(config *types.Configuration) error {
 			if s.GetString("target") == "" {
 				return errors.New("No target specified for docker-compose scaler [" + name + "]")
 			}
-			config.Scalers[name] = scaler.NewComposeScaler(s.GetString("target"), s.GetString("config"))
+			cs, err := scaler.NewComposeScaler(s.GetString("target"), s.GetString("config"))
+			if err != nil {
+				return fmt.Errorf("cannot create docker-compose scaler [%s]: %s", name, err)
+			}
+			config.Scalers[name] = cs
 		case "docker-service":
 			if s.GetString("service") == "" {
 				return errors.New("No service specified for docker-service scaler [" + name + "]")

@@ -2,10 +2,13 @@ package scaler
 
 import (
 	"encoding/json"
+	"fmt"
 	"os/exec"
 	"strconv"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/Zenika/zscaler/core"
+	"github.com/Zenika/zscaler/core/tls"
 	"github.com/Zenika/zscaler/core/types"
 )
 
@@ -14,17 +17,30 @@ type ComposeScaler struct {
 	ServiceName       string `json:"service"`
 	ConfigFile        string `json:"config"`
 	RunningContainers int    `json:"running"`
+	withTLS           bool
+	tlsCertsPath      string
 }
 
-// NewComposeScaler buil a scaler
-func NewComposeScaler(name string, ConfigFilePath string) types.Scaler {
+// NewComposeScaler build a scaler
+func NewComposeScaler(name string, ConfigFilePath string) (types.Scaler, error) {
 	// TODO need to gather containers, add an INIT ?
 	// TODO check for file at provided location
-	return &ComposeScaler{
+	cs := &ComposeScaler{
 		ServiceName:       name,
 		ConfigFile:        ConfigFilePath, // need check
 		RunningContainers: 3,              // should be discovered
+		withTLS:           false,          // enforcing default
 	}
+	// TLS configuration
+	if core.Config.Orchestrator.TLS {
+		var err error
+		cs.tlsCertsPath, err = tls.CheckTLSConfigPath()
+		if err != nil {
+			return nil, fmt.Errorf("bad tls config: %s", err)
+		}
+		cs.withTLS = true
+	}
+	return cs, nil
 }
 
 // Describe scaler

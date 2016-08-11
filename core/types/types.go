@@ -17,6 +17,7 @@ type OrchestratorConfig struct {
 	TLSCACertPath string // ca cert path, PEM formated
 	TLSCertPath   string // user cert path, PEM formated
 	TLSKeyPath    string // user private key path, PEM formated
+	TLS           bool   // TLS activation status
 }
 
 // A Rule must be able to perform a check

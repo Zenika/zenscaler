@@ -2,7 +2,11 @@
 package core
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 
 	"github.com/Zenika/zscaler/core/rule"
 	"github.com/Zenika/zscaler/core/scaler"
@@ -30,12 +34,10 @@ type OrchestratorConfig struct {
 	TLSCACertPath string // ca cert path, PEM formated
 	TLSCertPath   string // user cert path, PEM formated
 	TLSKeyPath    string // user private key path, PEM formated
-	tlsStatus     bool
 }
 
 // CheckTLS for missing certificate and key
 func (o OrchestratorConfig) CheckTLS() error {
-	o.tlsStatus = false // enforcing default value
 	if o.TLSCACertPath+o.TLSCertPath+o.TLSKeyPath == "" {
 		return nil
 	}
@@ -48,13 +50,41 @@ func (o OrchestratorConfig) CheckTLS() error {
 		return fmt.Errorf("tls-key path not provided")
 	}
 	// all set, TLS seems ok !
-	o.tlsStatus = true
 	return nil
 }
 
-// TLSOK reports TLS activation status
-func TLSOK() bool {
-	return Config.Orchestrator.tlsStatus
+// HTTPSClient return configured http client
+func (o OrchestratorConfig) HTTPSClient() (*http.Client, error) {
+	//try to load up files...
+	ca, err := ioutil.ReadFile(o.TLSCACertPath)
+	if err != nil {
+		return nil, fmt.Errorf("tls-cacert: %s", err)
+	}
+	cert, err := ioutil.ReadFile(o.TLSCertPath)
+	if err != nil {
+		return nil, fmt.Errorf("tls-cert: %s", err)
+	}
+	key, err := ioutil.ReadFile(o.TLSKeyPath)
+	if err != nil {
+		return nil, fmt.Errorf("tls-key: %s", err)
+	}
+	// load PEM
+	certPair, err := tls.LoadX509KeyPair(string(cert), string(key))
+	if err != nil {
+		return nil, fmt.Errorf("cannot load key pair: %s", err)
+	}
+	caPool := x509.NewCertPool()
+	if ok := caPool.AppendCertsFromPEM(ca); !ok {
+		return nil, fmt.Errorf("failed to load CA file")
+	}
+	// build up https configuration
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			Certificates: append(make([]tls.Certificate, 1, 1), certPair),
+			RootCAs:      caPool,
+		},
+	}
+	return &http.Client{Transport: tr}, nil
 }
 
 // Initialize core module

@@ -37,20 +37,20 @@ type OrchestratorConfig struct {
 }
 
 // CheckTLS for missing certificate and key
-func (o OrchestratorConfig) CheckTLS() error {
+func (o OrchestratorConfig) CheckTLS() (bool, error) {
 	if o.TLSCACertPath+o.TLSCertPath+o.TLSKeyPath == "" {
-		return nil
+		return false, nil
 	}
 	switch "" {
 	case o.TLSCACertPath:
-		return fmt.Errorf("tls-cacert path not provided")
+		return false, fmt.Errorf("tls-cacert path not provided")
 	case o.TLSCertPath:
-		return fmt.Errorf("tls-cert path not provided")
+		return false, fmt.Errorf("tls-cert path not provided")
 	case o.TLSKeyPath:
-		return fmt.Errorf("tls-key path not provided")
+		return false, fmt.Errorf("tls-key path not provided")
 	}
 	// all set, TLS seems ok !
-	return nil
+	return true, nil
 }
 
 // HTTPSClient return configured http client

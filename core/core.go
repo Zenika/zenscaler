@@ -52,8 +52,8 @@ func (o OrchestratorConfig) CheckTLS() error {
 	return nil
 }
 
-// TLSActivated activation status
-func TLSActivated() bool {
+// TLSOK reports TLS activation status
+func TLSOK() bool {
 	return Config.Orchestrator.tlsStatus
 }
 

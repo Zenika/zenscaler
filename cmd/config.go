@@ -84,7 +84,8 @@ func parseOrchestrator(config *core.Configuration) error {
 		return fmt.Errorf("No endpoint specified")
 	}
 	// check TLS requirements
-	return config.Orchestrator.CheckTLS()
+	_, err := config.Orchestrator.CheckTLS()
+	return err
 }
 
 func parseScalers(config *core.Configuration) error {

@@ -8,36 +8,15 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/Zenika/zscaler/core/rule"
-	"github.com/Zenika/zscaler/core/scaler"
-
-	log "github.com/Sirupsen/logrus"
+	"github.com/Zenika/zscaler/core/types"
 )
 
-const bufferSize = 10
-
 // Config store the current running configuration
-var Config *Configuration
-
-// Configuration holder
-type Configuration struct {
-	Orchestrator OrchestratorConfig
-	Scalers      map[string]scaler.Scaler
-	Rules        map[string]rule.Rule
-	Errchan      chan error
-}
-
-// OrchestratorConfig hold all necessary connection informations
-type OrchestratorConfig struct {
-	Kind          string // docker, kubernetes, mesos...
-	Endpoint      string // http adress:port or unix socket
-	TLSCACertPath string // ca cert path, PEM formated
-	TLSCertPath   string // user cert path, PEM formated
-	TLSKeyPath    string // user private key path, PEM formated
-}
+var Config *types.Configuration
 
 // CheckTLS for missing certificate and key
-func (o OrchestratorConfig) CheckTLS() (bool, error) {
+func CheckTLS() (bool, error) {
+	o := Config.Orchestrator
 	if o.TLSCACertPath+o.TLSCertPath+o.TLSKeyPath == "" {
 		return false, nil
 	}
@@ -54,7 +33,8 @@ func (o OrchestratorConfig) CheckTLS() (bool, error) {
 }
 
 // HTTPSClient return configured http client
-func (o OrchestratorConfig) HTTPSClient() (*http.Client, error) {
+func HTTPSClient() (*http.Client, error) {
+	o := Config.Orchestrator
 	//try to load up files...
 	ca, err := ioutil.ReadFile(o.TLSCACertPath)
 	if err != nil {
@@ -85,26 +65,4 @@ func (o OrchestratorConfig) HTTPSClient() (*http.Client, error) {
 		},
 	}
 	return &http.Client{Transport: tr}, nil
-}
-
-// Initialize core module
-func (c Configuration) Initialize() {
-	c.Errchan = make(chan error, bufferSize)
-	c.loop()
-}
-
-// event loop
-func (c Configuration) loop() {
-	log.Debug("Enter control loop...")
-	// lanch a watcher on each rule
-	for _, r := range c.Rules {
-		go rule.Watcher(c.Errchan, r)
-	}
-	// watch for errors
-	for {
-		err := <-c.Errchan
-		if err != nil {
-			log.Errorf("%s", err)
-		}
-	}
 }

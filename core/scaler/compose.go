@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/Zenika/zscaler/core/types"
 )
 
 // ComposeScaler executer docker-compose CLI
@@ -16,7 +17,7 @@ type ComposeScaler struct {
 }
 
 // NewComposeScaler buil a scaler
-func NewComposeScaler(name string, ConfigFilePath string) Scaler {
+func NewComposeScaler(name string, ConfigFilePath string) types.Scaler {
 	// TODO need to gather containers, add an INIT ?
 	// TODO check for file at provided location
 	return &ComposeScaler{

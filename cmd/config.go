@@ -9,6 +9,7 @@ import (
 	"github.com/Zenika/zscaler/core/probe"
 	"github.com/Zenika/zscaler/core/rule"
 	"github.com/Zenika/zscaler/core/scaler"
+	"github.com/Zenika/zscaler/core/types"
 	"github.com/Zenika/zscaler/swarm"
 
 	log "github.com/Sirupsen/logrus"
@@ -33,7 +34,7 @@ var dumpConfigCmd = &cobra.Command{
 	},
 }
 
-func parseConfig() (*core.Configuration, error) {
+func parseConfig() (*types.Configuration, error) {
 	// parse config file
 	viper.SetConfigName("config") // name of config file (without extension)
 	viper.AddConfigPath(".")      // look for config in the working directory
@@ -43,9 +44,9 @@ func parseConfig() (*core.Configuration, error) {
 	}
 
 	// global configuration structure
-	var config = &core.Configuration{
-		Scalers: make(map[string]scaler.Scaler, defaultMapEnties),
-		Rules:   make(map[string]rule.Rule, defaultMapEnties),
+	var config = &types.Configuration{
+		Scalers: make(map[string]types.Scaler, defaultMapEnties),
+		Rules:   make(map[string]types.Rule, defaultMapEnties),
 	}
 
 	err = parseOrchestrator(config)
@@ -67,12 +68,12 @@ func parseConfig() (*core.Configuration, error) {
 	return config, nil
 }
 
-func parseOrchestrator(config *core.Configuration) error {
+func parseOrchestrator(config *types.Configuration) error {
 	sub := viper.Sub("orchestrator")
 	if sub == nil {
 		return fmt.Errorf("Orchestrator section missing!")
 	}
-	config.Orchestrator = core.OrchestratorConfig{
+	config.Orchestrator = types.OrchestratorConfig{
 		Kind:          sub.GetString("type"),
 		Endpoint:      sub.GetString("endpoint"),
 		TLSCACertPath: sub.GetString("tls-cacert"),
@@ -84,11 +85,11 @@ func parseOrchestrator(config *core.Configuration) error {
 		return fmt.Errorf("No endpoint specified")
 	}
 	// check TLS requirements
-	_, err := config.Orchestrator.CheckTLS()
+	_, err := core.CheckTLS()
 	return err
 }
 
-func parseScalers(config *core.Configuration) error {
+func parseScalers(config *types.Configuration) error {
 	var scalers = viper.Sub("scalers")
 	for _, name := range scalers.AllKeys() {
 		log.Info("Add scaler [" + name + "]")
@@ -117,7 +118,7 @@ func parseScalers(config *core.Configuration) error {
 	return nil
 }
 
-func parseRules(config *core.Configuration) error {
+func parseRules(config *types.Configuration) error {
 	rules := viper.Sub("rules")
 	for _, r := range rules.AllKeys() {
 		target := rules.Sub(r).GetString("target")
@@ -155,7 +156,7 @@ func parseRules(config *core.Configuration) error {
 	return nil
 }
 
-func parseProbe(config *core.Configuration, r string) (p probe.Probe, err error) {
+func parseProbe(config *types.Configuration, r string) (p types.Probe, err error) {
 	rules := viper.Sub("rules")
 	target := rules.Sub(r).GetString("target")
 
@@ -186,7 +187,7 @@ func parseProbe(config *core.Configuration, r string) (p probe.Probe, err error)
 	return p, nil
 }
 
-func parseProbeHAP(rules *viper.Viper, r string, splittedProbe []string) (probe.Probe, error) {
+func parseProbeHAP(rules *viper.Viper, r string, splittedProbe []string) (types.Probe, error) {
 	if len(splittedProbe) != 3 {
 		return nil, errors.New("hap probe need to be like hap.foo.bar")
 	}
@@ -200,7 +201,7 @@ func parseProbeHAP(rules *viper.Viper, r string, splittedProbe []string) (probe.
 	}, nil
 }
 
-func parseProbeProm(rules *viper.Viper, r string, splittedProbe []string) (probe.Probe, error) {
+func parseProbeProm(rules *viper.Viper, r string, splittedProbe []string) (types.Probe, error) {
 	if splittedProbe[1] == "http" {
 		if rules.Sub(r).GetString("url") == "" {
 			return nil, errors.New("No url specified for Prometheus probe")

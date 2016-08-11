@@ -8,22 +8,14 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/Zenika/zscaler/core/probe"
-	"github.com/Zenika/zscaler/core/scaler"
+	"github.com/Zenika/zscaler/core/types"
 
 	log "github.com/Sirupsen/logrus"
 )
 
-// A Rule must be able to perform a check
-type Rule interface {
-	Check() error                 // performe a check on the target and act if needed
-	CheckInterval() time.Duration // time to wait between each check
-	JSON() ([]byte, error)        // return a JSON output
-}
-
 // Watcher check periodically the rule and report back errors
 // TODO channel back to kill if needed
-func Watcher(c chan error, r Rule) {
+func Watcher(c chan error, r types.Rule) {
 	for {
 		err := r.Check()
 		if err != nil {
@@ -38,9 +30,9 @@ func Watcher(c chan error, r Rule) {
 type FloatValue struct {
 	RuleName       string               `json:"rule"`
 	ServiceName    string               `json:"service"`
-	Scale          scaler.Scaler        `json:"-"`
+	Scale          types.Scaler         `json:"-"`
 	ScalerID       string               `json:"scaler"`
-	Probe          probe.Probe          `json:"-"`
+	Probe          types.Probe          `json:"-"`
 	ProbeID        string               `json:"probe"`
 	RefreshRate    time.Duration        `json:"resfreshRate"`
 	UpDefinition   string               `json:"up"`

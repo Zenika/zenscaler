@@ -7,6 +7,7 @@ import (
 
 	"github.com/Zenika/zscaler/core"
 	"github.com/Zenika/zscaler/core/scaler"
+	"github.com/Zenika/zscaler/core/types"
 
 	"github.com/gin-gonic/gin"
 )
@@ -46,7 +47,7 @@ type ScalerBuilder struct {
 }
 
 // Build validate inputed data and return a specific scaler wrapped in interface
-func (sb *ScalerBuilder) Build() (scaler.Scaler, error) {
+func (sb *ScalerBuilder) Build() (types.Scaler, error) {
 	if sb.Name == "" {
 		return nil, fmt.Errorf("missing `name` field")
 	}

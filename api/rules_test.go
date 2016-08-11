@@ -5,20 +5,20 @@ import (
 	"testing"
 
 	"github.com/Zenika/zscaler/core"
-	"github.com/Zenika/zscaler/core/rule"
 	"github.com/Zenika/zscaler/core/scaler"
+	"github.com/Zenika/zscaler/core/types"
 	"github.com/spf13/viper"
 
 	"github.com/stretchr/testify/assert"
 )
 
-var MockConf = &core.Configuration{
-	Scalers: map[string]scaler.Scaler{
+var MockConf = &types.Configuration{
+	Scalers: map[string]types.Scaler{
 		"whoami-compose": &scaler.ComposeScaler{
 			ServiceName: "whoami",
 		},
 	},
-	Rules: map[string]rule.Rule{},
+	Rules: map[string]types.Rule{},
 }
 
 func failIfErr(t *testing.T, err error) {

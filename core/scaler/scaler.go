@@ -6,14 +6,6 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-// Scaler control the service
-type Scaler interface {
-	Describe() string
-	Up() error
-	Down() error
-	JSON() ([]byte, error)
-}
-
 // MockScaler write "scale up" or "scale down" to stdout
 type MockScaler struct{}
 

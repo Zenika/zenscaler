@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Zenika/zscaler/core"
 	"github.com/Zenika/zscaler/core/probe"
 	"github.com/Zenika/zscaler/core/rule"
 	"github.com/Zenika/zscaler/core/scaler"
@@ -48,6 +49,8 @@ func parseConfig() (*types.Configuration, error) {
 		Scalers: make(map[string]types.Scaler, defaultMapEnties),
 		Rules:   make(map[string]types.Rule, defaultMapEnties),
 	}
+	// set it as global
+	core.Config = config
 
 	err = parseOrchestrator(config)
 	if err != nil {
@@ -85,7 +88,7 @@ func parseOrchestrator(config *types.Configuration) error {
 		return fmt.Errorf("No endpoint specified")
 	}
 	// check TLS requirements
-	return tls.CheckTLS()
+	return tls.CheckTLS(config)
 }
 
 func parseScalers(config *types.Configuration) error {

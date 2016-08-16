@@ -9,11 +9,12 @@ import (
 	"path"
 
 	"github.com/Zenika/zscaler/core"
+	"github.com/Zenika/zscaler/core/types"
 )
 
 // CheckTLS for missing certificate and key
-func CheckTLS() error {
-	o := core.Config.Orchestrator
+func CheckTLS(config *types.Configuration) error {
+	o := &config.Orchestrator
 	o.TLS = false // enforcing default
 	if o.TLSCACertPath+o.TLSCertPath+o.TLSKeyPath == "" {
 		return nil
@@ -39,16 +40,8 @@ func HTTPSClient() (*http.Client, error) {
 	if err != nil {
 		return nil, fmt.Errorf("tls-cacert: %s", err)
 	}
-	cert, err := ioutil.ReadFile(o.TLSCertPath)
-	if err != nil {
-		return nil, fmt.Errorf("tls-cert: %s", err)
-	}
-	key, err := ioutil.ReadFile(o.TLSKeyPath)
-	if err != nil {
-		return nil, fmt.Errorf("tls-key: %s", err)
-	}
 	// load PEM
-	certPair, err := tls.LoadX509KeyPair(string(cert), string(key))
+	certPair, err := tls.LoadX509KeyPair(o.TLSCertPath, o.TLSKeyPath)
 	if err != nil {
 		return nil, fmt.Errorf("cannot load key pair: %s", err)
 	}

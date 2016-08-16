@@ -9,7 +9,6 @@ import (
 	"github.com/docker/engine-api/client"
 	"github.com/docker/engine-api/types"
 	"github.com/docker/engine-api/types/filters"
-	"github.com/spf13/viper"
 	"golang.org/x/net/context"
 
 	"github.com/Zenika/zscaler/core"
@@ -35,7 +34,7 @@ func getAPI() Provider {
 			}
 		}
 		defaultHeaders := map[string]string{"User-Agent": "engine-api-cli-1.0"}
-		cli, err := client.NewClient(viper.GetString("endpoint"), "v1.22", HTTPClient, defaultHeaders)
+		cli, err := client.NewClient(core.Config.Orchestrator.Endpoint, "v1.22", HTTPClient, defaultHeaders)
 		if err != nil {
 			log.Panic(err)
 		}

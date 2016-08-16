@@ -2,6 +2,10 @@
 *.pem
 *.csr
 *.srl
+*.cert
+*.key
+*.cnf
+*.crt
 zscaler
 vendor/
 .glide/

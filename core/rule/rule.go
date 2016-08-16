@@ -49,20 +49,26 @@ func (r *FloatValue) Check() error {
 	}
 	log.Debugf("["+r.ServiceName+"] "+r.Probe.Name()+" at %.2f ", probe)
 	if r.Up(probe) && r.Down(probe) {
-		log.Warning("[" + r.ServiceName + "] try to scale up and down at the same time! (nothing done)")
+		log.WithFields(log.Fields{
+			"service": r.ServiceName,
+		}).Warning("try to scale up and down at the same time! (nothing done)")
 		return nil
 	}
 	if r.Up(probe) {
 		err := r.Scale.Up()
 		if err != nil {
-			log.Errorf("Error when scaling up: %s", err)
+			log.WithFields(log.Fields{
+				"service": r.ServiceName,
+			}).Errorf("error when scaling up: %s", err)
 			return nil
 		}
 	}
 	if r.Down(probe) {
 		err := r.Scale.Down()
 		if err != nil {
-			log.Errorf("Error when scaling down: %s", err)
+			log.WithFields(log.Fields{
+				"service": r.ServiceName,
+			}).Errorf("error when scaling down: %s", err)
 			return nil
 		}
 	}

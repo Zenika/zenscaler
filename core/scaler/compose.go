@@ -65,13 +65,16 @@ func (s *ComposeScaler) Up() error {
 	// #nosec TODO replace with libcompose API
 	upCmd := exec.Command("docker-compose", "-f", s.ConfigFile, "scale", s.ServiceName+"="+strconv.Itoa(s.RunningContainers+1))
 	upCmd.Env = s.env
-	log.Infof("Scale "+s.ServiceName+" up to %d", s.RunningContainers+1)
 	out, err := upCmd.CombinedOutput()
 	if err != nil {
 		log.Errorf("out: %s\nerr: %v", out, err)
 		return err
 	}
 	s.RunningContainers++
+	log.WithFields(log.Fields{
+		"service": s.ServiceName,
+		"count":   s.RunningContainers,
+	}).Infof("scale up")
 	return nil
 }
 
@@ -84,13 +87,16 @@ func (s *ComposeScaler) Down() error {
 	// #nosec TODO replace with libcompose API
 	downCmd := exec.Command("docker-compose", "-f", s.ConfigFile, "scale", s.ServiceName+"="+strconv.Itoa(s.RunningContainers-1))
 	downCmd.Env = s.env
-	log.Infof("Scale "+s.ServiceName+" down to %d", s.RunningContainers-1)
 	out, err := downCmd.CombinedOutput()
 	if err != nil {
 		log.Errorf("out: %s\nerr: %v", out, err)
 		return err
 	}
 	s.RunningContainers--
+	log.WithFields(log.Fields{
+		"service": s.ServiceName,
+		"count":   s.RunningContainers,
+	}).Infof("scale down")
 	return nil
 }
 

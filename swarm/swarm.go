@@ -70,7 +70,10 @@ func (sp Provider) getTag(tag string) []types.Container {
 func (sp Provider) getStats(cID string) *types.StatsJSON {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	log.Debug("Get Stats for " + cID)
+	log.WithFields(log.Fields{
+		"cid": cID[0:12],
+		"tls": core.Config.Orchestrator.TLS,
+	}).Debugf("swarm: get stats")
 	r, err := sp.cli.ContainerStats(ctx, cID, false)
 	if err != nil {
 		log.Errorf("%s", err)

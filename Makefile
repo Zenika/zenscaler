@@ -10,7 +10,7 @@ vendors:
 	glide install
 
 install:
-	go install .
+	go install --ldflags "-s -w -X github.com/Zenika/zscaler/core.Version=`git describe --tags`" .
 linter:
 	go install . && gometalinter -j4 --deadline 300s ./...
 unit_test:

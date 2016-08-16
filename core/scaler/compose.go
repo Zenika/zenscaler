@@ -3,6 +3,7 @@ package scaler
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"os/exec"
 	"strconv"
 
@@ -19,6 +20,7 @@ type ComposeScaler struct {
 	RunningContainers int    `json:"running"`
 	withTLS           bool
 	tlsCertsPath      string
+	env               []string
 }
 
 // NewComposeScaler build a scaler
@@ -31,7 +33,7 @@ func NewComposeScaler(name string, ConfigFilePath string) (types.Scaler, error) 
 		RunningContainers: 3,              // should be discovered
 		withTLS:           false,          // enforcing default
 	}
-	// TLS configuration
+	// TLS configuration is checked beforehand but we need to perform additional checks
 	if core.Config.Orchestrator.TLS {
 		var err error
 		cs.tlsCertsPath, err = tls.CheckTLSConfigPath()
@@ -40,6 +42,7 @@ func NewComposeScaler(name string, ConfigFilePath string) (types.Scaler, error) 
 		}
 		cs.withTLS = true
 	}
+	cs.buildEnv()
 	return cs, nil
 }
 
@@ -61,6 +64,7 @@ func (s *ComposeScaler) JSON() ([]byte, error) {
 func (s *ComposeScaler) Up() error {
 	// #nosec TODO replace with libcompose API
 	upCmd := exec.Command("docker-compose", "-f", s.ConfigFile, "scale", s.ServiceName+"="+strconv.Itoa(s.RunningContainers+1))
+	upCmd.Env = s.env
 	log.Infof("Scale "+s.ServiceName+" up to %d", s.RunningContainers+1)
 	out, err := upCmd.CombinedOutput()
 	if err != nil {
@@ -79,6 +83,7 @@ func (s *ComposeScaler) Down() error {
 	}
 	// #nosec TODO replace with libcompose API
 	downCmd := exec.Command("docker-compose", "-f", s.ConfigFile, "scale", s.ServiceName+"="+strconv.Itoa(s.RunningContainers-1))
+	downCmd.Env = s.env
 	log.Infof("Scale "+s.ServiceName+" down to %d", s.RunningContainers-1)
 	out, err := downCmd.CombinedOutput()
 	if err != nil {
@@ -87,4 +92,14 @@ func (s *ComposeScaler) Down() error {
 	}
 	s.RunningContainers--
 	return nil
+}
+
+// build commands environnement
+func (s *ComposeScaler) buildEnv() {
+	s.env = os.Environ()
+	s.env = append(s.env, fmt.Sprintf("DOCKER_HOST=%s", core.Config.Orchestrator.Endpoint))
+	if s.withTLS { // all certs are in the same path and named correctly
+		s.env = append(s.env, fmt.Sprintf("DOCKER_CERT_PATH=%s", s.tlsCertsPath))
+		s.env = append(s.env, fmt.Sprintf("DOCKER_TLS_VERIFY=%s", "yes"))
+	}
 }

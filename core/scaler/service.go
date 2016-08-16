@@ -3,8 +3,11 @@ package scaler
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/Zenika/zscaler/core"
+	"github.com/Zenika/zscaler/core/tls"
 	"github.com/docker/engine-api/client"
 	"github.com/docker/engine-api/types"
 	"golang.org/x/net/context"
@@ -75,9 +78,16 @@ func (s *ServiceScaler) scaleService(scale func(uint64) uint64) error {
 
 // Lazy init of new API channel to docker engine
 func (s *ServiceScaler) getDocker() (cli *client.Client, err error) {
+	var HTTPClient *http.Client
+	if core.Config.Orchestrator.TLS {
+		HTTPClient, err = tls.HTTPSClient()
+		if err != nil {
+			return nil, err
+		}
+	}
 	if s.cli == nil {
 		defaultHeaders := map[string]string{"User-Agent": "engine-api-cli-1.0"}
-		s.cli, err = client.NewClient(s.EngineSocket, "v1.24", nil, defaultHeaders)
+		s.cli, err = client.NewClient(s.EngineSocket, "v1.24", HTTPClient, defaultHeaders)
 	}
 	return s.cli, err
 }

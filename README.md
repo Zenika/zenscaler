@@ -22,7 +22,12 @@ Please refer to the dedicated [wiki page](https://github.com/Zenika/zscaler/wiki
 Use-case configuration files can be found under the `examples/` folder. Here's a sample:
 
 ```YAML
-endpoint: "unix:///var/run/docker.sock"
+orchestrator:
+    engine: "docker"                   # only docker is supported ATM
+    endpoint: "tcp://localhost:2376"   # optionnal, default to unix socket
+    tls-cacert: "ca.pem"               # if using TLS
+    tls-cert: "cert.pem"
+    tls-key: "key.pem"
 scalers:                               # scaler section
     whoami-compose:                    # custom id
         type: "docker-compose"         # what do we use to scale the service ?
@@ -65,7 +70,8 @@ Flags:
 API
 ---
 
-A REST API is available at startup, listening on `:3000`. You can find examples on the [wiki page](https://github.com/Zenika/zscaler/wiki/API).
+A REST API is available at startup, listening on `:3000` (change it with `-l` or `--api-port` flag).
+You can find examples on the [wiki page](https://github.com/Zenika/zscaler/wiki/API).
 
 URL                | HTTP verb | Description
 -------------------|-----------|------

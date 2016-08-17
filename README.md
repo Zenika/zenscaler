@@ -10,18 +10,22 @@ Requirements
 -----
 
 - A running docker engine
-- `docker-service` scaler require docker 1.12 (with `--replica`)
+- `docker-service` scaler require docker `1.12` (with `--replica`)
 - `docker-compose` >1.5 (with `scale`) in your path
 
 Try it out !
 ------------
-
-```
+Clone the repository in your `$GOPATH` or anywhere
+```BASH
 git clone --depth=1 git@github.com:Zenika/zscaler.git
-cd zscaler
-make docker # build in docker and create docker image
-cd ./examples/docker-compose/traefik
-docker-compose up
+```
+Build it
+```BASH
+$ make docker # build in docker and create docker image
+```
+Run an example with træfik on Docker
+```BASH
+$ cd ./examples/docker-compose/traefik && docker-compose up
 ```
 
 Usage

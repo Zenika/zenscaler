@@ -18,6 +18,7 @@ Try it out !
 
 ```
 git clone --depth=1 git@github.com:Zenika/zscaler.git
+cd zscaler
 make docker # build in docker and create docker image
 cd ./examples/docker-compose/traefik
 docker-compose up

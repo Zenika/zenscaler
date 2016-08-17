@@ -77,13 +77,16 @@ func parseOrchestrator(config *types.Configuration) error {
 		return fmt.Errorf("Orchestrator section missing!")
 	}
 	config.Orchestrator = types.OrchestratorConfig{
-		Kind:          sub.GetString("type"),
+		Engine:        sub.GetString("engine"),
 		Endpoint:      sub.GetString("endpoint"),
 		TLSCACertPath: sub.GetString("tls-cacert"),
 		TLSCertPath:   sub.GetString("tls-cert"),
 		TLSKeyPath:    sub.GetString("tls-key"),
 	}
 	// check endpoint
+	if config.Orchestrator.Endpoint == "" && config.Orchestrator.Engine == "docker" {
+		config.Orchestrator.Endpoint = "unix:///var/run/docker.sock" // default socket
+	}
 	if config.Orchestrator.Endpoint == "" {
 		return fmt.Errorf("No endpoint specified")
 	}

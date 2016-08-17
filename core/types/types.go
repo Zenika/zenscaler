@@ -12,7 +12,7 @@ type Configuration struct {
 
 // OrchestratorConfig hold all necessary connection informations
 type OrchestratorConfig struct {
-	Kind          string // docker, kubernetes, mesos...
+	Engine        string // docker, kubernetes, mesos...
 	Endpoint      string // http adress:port or unix socket
 	TLSCACertPath string // ca cert path, PEM formated
 	TLSCertPath   string // user cert path, PEM formated

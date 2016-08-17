@@ -1,5 +1,5 @@
 orchestrator:
-    kind: "docker"
+    engine: "docker"
     endpoint: "tcp://localhost:2376"
     tls-cacert: "./examples/docker-compose/traefik/ca.pem"
     tls-cert: "./examples/docker-compose/traefik/cert.pem"

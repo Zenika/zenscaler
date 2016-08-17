@@ -22,4 +22,5 @@ dependencies:
 test:
     override:
         - go test -race -v -cover -timeout 120s ./api
+        - go test -race -v -cover -timeout 120s ./cmd
         - gometalinter -j4 --deadline 300s ./...

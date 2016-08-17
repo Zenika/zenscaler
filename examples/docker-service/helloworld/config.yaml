@@ -1,4 +1,6 @@
-endpoint: "unix:///var/run/docker.sock"
+orchestrator:
+    engine: "docker"
+    endpoint: "unix:///var/run/docker.sock"
 scalers:
     helloworld:
         type: "docker-service"

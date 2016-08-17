@@ -1,16 +1,27 @@
-zScaler
+zscaler
 =======
 
 [![CircleCI](https://circleci.com/gh/Zenika/zscaler/tree/master.svg?style=svg&circle-token=78b4c3db440a574eea374cc602addd51a6b5e249)](https://circleci.com/gh/Zenika/zscaler/tree/master)
 
-zScaler aims to be an environment-agnostic, simple and flexible scaler. It plugs itself on any existing infrastructure, probe metrics and scale services according to configured rules by issuing orders to orchestration engines.
+zscaler aims to be an environment-agnostic, simple and flexible scaler. It plugs itself on any existing infrastructure, probe metrics and scale services according to configured rules by issuing orders to orchestration engines.
 Currently, the only supported target is the docker engine.
 
 Requirements
 -----
-zScaler requires a docker engine to interact with and:
-- `docker-compose` scaler: `docker-compose` >1.5 (with `scale`) in your path
-- `docker-service` scaler: specified engine must be 1.12 (with `--replica`)
+
+- A running docker engine
+- `docker-service` scaler require docker 1.12 (with `--replica`)
+- `docker-compose` >1.5 (with `scale`) in your path
+
+Try it out !
+------------
+
+```
+git clone --depth=1 git@github.com:Zenika/zscaler.git
+make docker # build in docker and create docker image
+cd ./examples/docker-compose/traefik
+docker-compose up
+```
 
 Usage
 -----
@@ -99,11 +110,11 @@ If you have a docker engine, you can build zScaler inside a container and run it
 ```BASH
 make docker
 ```
-The build image is tagged `zscaler-build` and the production image `zscaler`.
+The golang build image is tagged `zscaler-build` and the production image `zscaler`.
 
 Aside : Deploy on EC2
 -------------
 
-Some ansible scripts where crafted ahead of development to bootstrap cluster deployment when needed. You can find them under the `deploy/` directory.
+Some `ansible` scripts where crafted ahead of development to bootstrap cluster deployment when needed. You can find them under the `deploy/` directory.
 
 _Project supported by Maximilien Richer, supervised by Sylvain Revereault (Zenika Rennes)_

@@ -69,7 +69,11 @@ func (s *ServiceScaler) scaleService(scale func(uint64) uint64) error {
 		return fmt.Errorf("scale can only be used with replicated mode")
 	}
 	target := scale(*serviceMode.Replicated.Replicas)
-	log.Debugf("Scale "+s.ServiceID+" from %d to %d", *serviceMode.Replicated.Replicas, target)
+	log.WithFields(log.Fields{
+		"service": s.ServiceID,
+		"count":   *serviceMode.Replicated.Replicas,
+		"target":  target,
+	}).Debugf("scale service")
 	serviceMode.Replicated.Replicas = &target
 
 	err = cli.ServiceUpdate(ctx, service.ID, service.Version, service.Spec, types.ServiceUpdateOptions{})

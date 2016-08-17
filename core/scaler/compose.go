@@ -81,7 +81,10 @@ func (s *ComposeScaler) Up() error {
 // Down using doker compose scale
 func (s *ComposeScaler) Down() error {
 	if s.RunningContainers < 2 {
-		log.Debug("Cannot scale down below one container")
+		log.WithFields(log.Fields{
+			"service": s.ServiceName,
+			"count":   s.RunningContainers,
+		}).Debug("cannot scale down: minimum count achieved")
 		return nil
 	}
 	// #nosec TODO replace with libcompose API

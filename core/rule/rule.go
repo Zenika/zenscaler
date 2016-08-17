@@ -47,7 +47,11 @@ func (r *FloatValue) Check() error {
 	if err != nil {
 		return err
 	}
-	log.Debugf("["+r.ServiceName+"] "+r.Probe.Name()+" at %.2f ", probe)
+	log.WithFields(log.Fields{
+		"service": r.ServiceName,
+		"probe":   r.Probe.Name(),
+		"value":   fmt.Sprintf("%.2f", probe),
+	}).Debugf("retrieved probe")
 	if r.Up(probe) && r.Down(probe) {
 		log.WithFields(log.Fields{
 			"service": r.ServiceName,

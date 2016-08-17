@@ -1,5 +1,9 @@
 orchestrator:
     engine: "docker"
+    endpoint: "tcp://localhost:2376"
+    tls-cacert: "./examples/docker-compose/traefik/ca.pem"
+    tls-cert: "./examples/docker-compose/traefik/cert.pem"
+    tls-key: "./examples/docker-compose/traefik/key.pem"
 scalers:
     whoami-compose:
         type: "docker-compose"
@@ -12,9 +16,10 @@ scalers:
 rules:
     whoami-cpu-scale:
         target: "whoami"
-        probe: "mock.sin"
-        up: "> 0.5"
-        down: "< 0.5"
+        probe: "cmd.execute"
+        cmd: "./traefik_rt.sh"
+        up: "> 20000"
+        down: "< 20000"
         scaler: whoami-compose
         refresh: 3s
     whoami2-cpu-scale:

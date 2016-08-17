@@ -15,6 +15,7 @@ linter:
 	go install . && gometalinter -j4 --deadline 300s ./...
 unit_test:
 	go test -v --cover ./api
+	go test -v --cover ./cmd
 
 build:
 	CGO_ENABLED=0 GOGC=off go build --ldflags "-s -w -X github.com/Zenika/zscaler/core.Version=`git describe --tags`" .

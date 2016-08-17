@@ -23,6 +23,9 @@ func TestConfigDockerComposeProm(t *testing.T) {
 func TestConfigDockerComposeTraefik(t *testing.T) {
 	openAndParseConfig(t, "./../examples/docker-compose/traefik")
 }
+func TestConfigDockerComposeTraefikTLS(t *testing.T) {
+	openAndParseConfig(t, "./../examples/docker-compose/traefik-tls")
+}
 func TestConfigDockerServiceHelloWorld(t *testing.T) {
 	openAndParseConfig(t, "./../examples/docker-service/helloworld")
 }

@@ -7,8 +7,7 @@ import (
 	"testing"
 
 	"github.com/Zenika/zscaler/core"
-	"github.com/Zenika/zscaler/core/rule"
-	"github.com/Zenika/zscaler/core/scaler"
+	"github.com/Zenika/zscaler/core/types"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
@@ -38,9 +37,9 @@ func getRequest(t *testing.T, route string) *http.Response {
 func TestIntegration(t *testing.T) {
 	gin.SetMode(gin.ReleaseMode) // supress GIN logging
 	// empty config file
-	core.Config = &core.Configuration{
-		Scalers: map[string]scaler.Scaler{},
-		Rules:   map[string]rule.Rule{},
+	core.Config = &types.Configuration{
+		Scalers: map[string]types.Scaler{},
+		Rules:   map[string]types.Rule{},
 	}
 	viper.Set("api-port", ":3000")
 	viper.Set("allow-cmd-probe", true)

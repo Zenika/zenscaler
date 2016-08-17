@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/Zenika/zscaler/api"
 	"github.com/Zenika/zscaler/core"
+	"github.com/Zenika/zscaler/core/rule"
 	"github.com/gin-gonic/gin"
 
 	log "github.com/Sirupsen/logrus"
@@ -26,6 +27,29 @@ var startCmd = &cobra.Command{
 			log.Fatalf("Fatal error reading config file: %s \n", err)
 		}
 		go api.Start()
-		core.Config.Initialize()
+		initialize()
 	},
+}
+
+// Initialize core module
+func initialize() {
+	c := core.Config
+	c.Errchan = make(chan error, 5)
+	loop()
+}
+
+func loop() {
+	c := core.Config
+	log.Debug("Enter control loop...")
+	// lanch a watcher on each rule
+	for _, r := range c.Rules {
+		go rule.Watcher(c.Errchan, r)
+	}
+	// watch for errors
+	for {
+		err := <-c.Errchan
+		if err != nil {
+			log.Errorf("%s", err)
+		}
+	}
 }

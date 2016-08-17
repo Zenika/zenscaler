@@ -9,12 +9,14 @@ dependencies:
     pre:
         - go get -u github.com/alecthomas/gometalinter
     override:
+        - rm -rf ../.go_workspace/src/github.com/Zenika/zscaler
+        - ln -s /home/ubuntu/zscaler ../.go_workspace/src/github.com/Zenika/zscaler
         - go get -v -d -t ./...
         - go build --ldflags "-s -w -X github.com/Zenika/zscaler/core.Version=`git describe --tags --always`" .:
             environment:
                 CGO_ENABLED: 0
                 GOGC: "off"
-        - go install:
+        - make install:
             pwd: ../.go_workspace/src/github.com/Zenika/zscaler
     post:
         - gometalinter --install --vendor
@@ -22,4 +24,5 @@ dependencies:
 test:
     override:
         - go test -race -v -cover -timeout 120s ./api
+        - go test -race -v -cover -timeout 120s ./cmd
         - gometalinter -j4 --deadline 300s ./...

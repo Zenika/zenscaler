@@ -2,12 +2,6 @@ package probe
 
 import "time"
 
-// Probe interface
-type Probe interface {
-	Name() string
-	Value() (float64, error)
-}
-
 // DefaultScalingProbe report a fake sensor value
 // Value goes from 0 to 1 and to 1 to 0 each minute
 type DefaultScalingProbe struct{}

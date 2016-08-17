@@ -1,4 +1,9 @@
-endpoint: "unix:///var/run/docker.sock"
+orchestrator:
+    engine: "docker"
+    endpoint: "tcp://localhost:2376"
+    tls-cacert: "./examples/docker-compose/traefik/ca.pem"
+    tls-cert: "./examples/docker-compose/traefik/cert.pem"
+    tls-key: "./examples/docker-compose/traefik/key.pem"
 scalers:
     whoami-compose:
         type: "docker-compose"

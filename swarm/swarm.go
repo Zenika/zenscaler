@@ -2,14 +2,17 @@ package swarm
 
 import (
 	"encoding/json"
+	"net/http"
 	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/docker/engine-api/client"
 	"github.com/docker/engine-api/types"
 	"github.com/docker/engine-api/types/filters"
-	"github.com/spf13/viper"
 	"golang.org/x/net/context"
+
+	"github.com/Zenika/zscaler/core"
+	"github.com/Zenika/zscaler/core/tls"
 )
 
 // Provider wrapper for docker API client
@@ -22,8 +25,16 @@ var provider *Provider
 // getAPI return a lazy-initialized provider
 func getAPI() Provider {
 	if provider == nil {
+		var HTTPClient *http.Client
+		if core.Config.Orchestrator.TLS {
+			var err error
+			HTTPClient, err = tls.HTTPSClient()
+			if err != nil {
+				log.Panic(err)
+			}
+		}
 		defaultHeaders := map[string]string{"User-Agent": "engine-api-cli-1.0"}
-		cli, err := client.NewClient(viper.GetString("endpoint"), "v1.22", nil, defaultHeaders)
+		cli, err := client.NewClient(core.Config.Orchestrator.Endpoint, "v1.22", HTTPClient, defaultHeaders)
 		if err != nil {
 			log.Panic(err)
 		}

@@ -40,7 +40,7 @@ var versionCmd = &cobra.Command{
 	Short: "Version number",
 	Long:  "Display version number and build informations",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("zScaler %s\n", core.Version)
+		fmt.Printf("zscaler %s, build with %s\n", core.Version, core.GoVersion)
 		return
 	},
 }

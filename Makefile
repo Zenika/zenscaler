@@ -5,7 +5,7 @@ test: unit_test linter
 
 deps:
 	go get -u ./...
-vendors:	
+vendors:
 	go get github.com/Masterminds/glide; \
 	glide install
 
@@ -22,6 +22,7 @@ build:
 
 docker: docker-build docker-image
 docker-build:
+	mkdir -p ./build
 	docker build -t zscaler-build -f build.Dockerfile . ; \
 	docker run -e "CGO_ENABLED=0" -e "GOGC=off" -v $$PWD/build:/build --rm zscaler-build go build --ldflags "-s -w -X github.com/Zenika/zscaler/core.Version=`git describe --tags`" -o /build/zscaler .
 

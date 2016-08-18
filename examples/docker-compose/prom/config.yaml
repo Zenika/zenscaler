@@ -4,6 +4,7 @@ orchestrator:
 scalers:
     whoami-compose:
         type: "docker-compose"
+        project: "prom"
         target: "whoami"
         config: "docker-compose.yaml"
 rules:

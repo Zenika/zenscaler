@@ -47,10 +47,12 @@ orchestrator:
 scalers:                               # scaler section
     whoami-compose:                    # custom id
         type: "docker-compose"         # what do we use to scale the service ?
+        project: "traefik"             # parameter for docker-compose
         target: "whoami"               # parameter for docker-compose
         config: "docker-compose.yaml"  # parameter for docker-compose
     whoami2-compose:
         type: "docker-compose"
+        project: "traefik"
         target: "whoami2"
         config: "docker-compose.yaml"
 rules:                                 # rule section

@@ -7,10 +7,12 @@ orchestrator:
 scalers:
     whoami-compose:
         type: "docker-compose"
+        project: "traefik-tls"
         target: "whoami"
         config: "docker-compose.yaml"
     whoami2-compose:
         type: "docker-compose"
+        project: "traefik-tls"
         target: "whoami2"
         config: "docker-compose.yaml"
 rules:

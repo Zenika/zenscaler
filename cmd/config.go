@@ -107,7 +107,10 @@ func parseScalers(config *types.Configuration) error {
 			if s.GetString("target") == "" {
 				return errors.New("No target specified for docker-compose scaler [" + name + "]")
 			}
-			cs, err := scaler.NewComposeScaler(s.GetString("target"), s.GetString("config"))
+			if s.GetString("project") == "" {
+				return errors.New("No project specified for docker-compose scaler [" + name + "]")
+			}
+			cs, err := scaler.NewComposeScaler(s.GetString("target"), s.GetString("project"), s.GetString("config"))
 			if err != nil {
 				return fmt.Errorf("cannot create docker-compose scaler [%s]: %s", name, err)
 			}

@@ -3,15 +3,16 @@ orchestrator:
 scalers:
     whoami-compose:
         type: "docker-compose"
+        project: "traefik"
         target: "whoami"
         config: "docker-compose.yaml"
     whoami2-compose:
         type: "docker-compose"
+        project: "traefik"
         target: "whoami2"
         config: "docker-compose.yaml"
 rules:
     whoami-cpu-scale:
-        target: "whoami"
         probe: "mock.sin"
         up: "> 0.5"
         down: "< 0.5"

@@ -4,6 +4,7 @@ orchestrator:
 scalers:
     dc-web:
         type: "docker-compose"
+        project: "hap"
         target: "web"
         config: "docker-compose.yaml"
 rules:

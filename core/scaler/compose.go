@@ -17,6 +17,7 @@ import (
 type ComposeScaler struct {
 	ServiceName       string `json:"service"`
 	ConfigFile        string `json:"config"`
+	ProjectName       string `json:"project"`
 	RunningContainers int    `json:"running"`
 	withTLS           bool
 	tlsCertsPath      string
@@ -24,16 +25,17 @@ type ComposeScaler struct {
 }
 
 // NewComposeScaler build a scaler
-func NewComposeScaler(name string, ConfigFilePath string) (types.Scaler, error) {
+func NewComposeScaler(name, project, ConfigFilePath string) (types.Scaler, error) {
 	// TODO need to gather containers, add an INIT ?
 	// TODO check for file at provided location
 	cs := &ComposeScaler{
 		ServiceName:       name,
 		ConfigFile:        ConfigFilePath, // need check
-		RunningContainers: 3,              // should be discovered
-		withTLS:           false,          // enforcing default
+		ProjectName:       project,
+		RunningContainers: 3,     // should be discovered
+		withTLS:           false, // enforcing default
 	}
-	// TLS configuration is checked beforehand but we need to perform additional checks
+	// TLS configuration is checked beforehand but we need to perform additional checks because of docker-compose limitations
 	if core.Config.Orchestrator.TLS {
 		var err error
 		cs.tlsCertsPath, err = tls.CheckTLSConfigPath()
@@ -67,7 +69,7 @@ func (s *ComposeScaler) Up() error {
 	upCmd.Env = s.env
 	out, err := upCmd.CombinedOutput()
 	if err != nil {
-		log.Errorf("out: %s\nerr: %v", out, err)
+		log.Errorf("out: %s\nerr: %s", out, err)
 		return err
 	}
 	s.RunningContainers++
@@ -107,6 +109,7 @@ func (s *ComposeScaler) Down() error {
 func (s *ComposeScaler) buildEnv() {
 	s.env = os.Environ()
 	s.env = append(s.env, fmt.Sprintf("DOCKER_HOST=%s", core.Config.Orchestrator.Endpoint))
+	s.env = append(s.env, fmt.Sprintf("COMPOSE_PROJECT_NAME=%s", s.ProjectName))
 	if s.withTLS { // all certs are in the same path and named correctly
 		s.env = append(s.env, fmt.Sprintf("DOCKER_CERT_PATH=%s", s.tlsCertsPath))
 		s.env = append(s.env, fmt.Sprintf("DOCKER_TLS_VERIFY=%s", "yes"))

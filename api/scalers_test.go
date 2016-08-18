@@ -23,6 +23,7 @@ func TestBuildComposeScaler(t *testing.T) {
     "name":"testing",
     "args": {
         "service":"whoami",
+        "project":"test",
         "config":"/dummy/path"
     }
 }`
@@ -36,6 +37,7 @@ func TestBuildComposeScalerBadType(t *testing.T) {
     "name":"testing",
     "args": {
         "service":"whoami",
+        "project":"test",
         "config":"/dummy/path"
     }
 }`

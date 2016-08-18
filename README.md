@@ -13,17 +13,17 @@ Requirements
 
 Try it out !
 ------------
-Clone the repository in your `$GOPATH` or anywhere
+Clone the repository in your `$GOPATH` or anywhere else
 ```BASH
-git clone --depth=1 git@github.com:Zenika/zscaler.git
+git clone git@github.com:Zenika/zscaler.git
 ```
 Build it
 ```BASH
-$ make docker # build in docker and create docker image
+make docker # build in docker and create docker image
 ```
 Run an example with træfik on Docker
 ```BASH
-$ cd ./examples/docker-compose/traefik && docker-compose up
+cd ./examples/docker-compose/traefik && docker-compose up
 ```
 Now you can open the [Træfik web UI](http://localhost:8080/) and watch the backend scale up and down in real time!
 

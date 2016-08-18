@@ -1,7 +1,5 @@
-zscaler
+zscaler  [![CircleCI](https://circleci.com/gh/Zenika/zscaler/tree/master.svg?style=svg&circle-token=78b4c3db440a574eea374cc602addd51a6b5e249)](https://circleci.com/gh/Zenika/zscaler/tree/master)
 =======
-
-[![CircleCI](https://circleci.com/gh/Zenika/zscaler/tree/master.svg?style=svg&circle-token=78b4c3db440a574eea374cc602addd51a6b5e249)](https://circleci.com/gh/Zenika/zscaler/tree/master)
 
 zscaler aims to be an environment-agnostic, simple and flexible scaler. It plugs itself on any existing infrastructure, probe metrics and scale services according to configured rules by issuing orders to orchestration engines.
 Currently, the only supported target is the docker engine.
@@ -26,6 +24,13 @@ $ make docker # build in docker and create docker image
 Run an example with træfik on Docker
 ```BASH
 $ cd ./examples/docker-compose/traefik && docker-compose up
+```
+Now you can open the [Træfik web UI](http://localhost:8080/) and watch the backend scale up and down in real time!
+
+This demo use a mock probe that report sinus-like values over 1min and causes the backend `whoami` to scale between 1 and 10 containers. The other probe is monitoring the CPU used across all `whoami2` containers. You can stress-test it with the following benchmark:
+
+ ```BASH
+ab -c 100 -n 10000000 -H 'Host:whoami2.docker.localhost' http://localhost/
 ```
 
 Usage

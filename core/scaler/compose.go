@@ -2,6 +2,7 @@ package scaler
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -10,7 +11,6 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/Zenika/zscaler/core"
 	"github.com/Zenika/zscaler/core/tls"
-	"github.com/Zenika/zscaler/core/types"
 )
 
 // ComposeScaler executer docker-compose CLI
@@ -19,21 +19,33 @@ type ComposeScaler struct {
 	ConfigFile        string `json:"config"`
 	ProjectName       string `json:"project"`
 	RunningContainers int    `json:"running"`
+	UpperCountLimit   int    `json:"UpperCountLimit"`
+	LowerCountLimit   int    `json:"LowerCountLimit"`
 	withTLS           bool
 	tlsCertsPath      string
 	env               []string
 }
 
 // NewComposeScaler build a scaler
-func NewComposeScaler(name, project, ConfigFilePath string) (types.Scaler, error) {
+func NewComposeScaler(name, project, configFilePath string) (*ComposeScaler, error) {
 	// TODO need to gather containers, add an INIT ?
 	// TODO check for file at provided location
+	switch "" { // check missing parameter
+	case name:
+		return nil, errors.New("No target specified")
+	case configFilePath:
+		return nil, errors.New("No configuration file path specified")
+	case project:
+		return nil, errors.New("No project specified")
+	}
 	cs := &ComposeScaler{
 		ServiceName:       name,
-		ConfigFile:        ConfigFilePath, // need check
+		ConfigFile:        configFilePath, // need check
 		ProjectName:       project,
 		RunningContainers: 3,     // should be discovered
 		withTLS:           false, // enforcing default
+		UpperCountLimit:   -1,    // default to unlimited
+		LowerCountLimit:   1,     // default to one, ensuring service avaibility
 	}
 	// TLS configuration is checked beforehand but we need to perform additional checks because of docker-compose limitations
 	if core.Config.Orchestrator.TLS {

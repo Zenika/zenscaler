@@ -101,18 +101,16 @@ func parseScalers(config *types.Configuration) error {
 		var s = scalers.Sub(name)
 		switch s.GetString("type") {
 		case "docker-compose":
-			if s.GetString("config") == "" {
-				return errors.New("No config specified for docker-compose scaler [" + name + "]")
-			}
-			if s.GetString("target") == "" {
-				return errors.New("No target specified for docker-compose scaler [" + name + "]")
-			}
-			if s.GetString("project") == "" {
-				return errors.New("No project specified for docker-compose scaler [" + name + "]")
-			}
 			cs, err := scaler.NewComposeScaler(s.GetString("target"), s.GetString("project"), s.GetString("config"))
 			if err != nil {
 				return fmt.Errorf("cannot create docker-compose scaler [%s]: %s", name, err)
+			}
+			// set optional parameter
+			if s.IsSet("upper_count_limit") {
+				cs.UpperCountLimit = s.GetInt("upper_count_limit")
+			}
+			if s.IsSet("lower_count_limit") {
+				cs.LowerCountLimit = s.GetInt("lower_count_limit")
 			}
 			config.Scalers[name] = cs
 		case "docker-service":

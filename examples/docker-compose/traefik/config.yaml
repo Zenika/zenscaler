@@ -6,6 +6,8 @@ scalers:
         project: "traefik"
         target: "whoami"
         config: "docker-compose.yaml"
+        upper_count_limit: 6
+        lower_count_limit: 1
     whoami2-compose:
         type: "docker-compose"
         project: "traefik"

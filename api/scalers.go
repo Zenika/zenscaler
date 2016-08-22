@@ -52,8 +52,8 @@ func (sb *ScalerBuilder) Build() (types.Scaler, error) {
 		return nil, fmt.Errorf("missing `name` field")
 	}
 	switch sb.Type {
-	case "docker-compose":
-		var dcs scaler.ComposeScaler
+	case "docker-compose-cmd":
+		var dcs scaler.ComposeCmdScaler
 		err := json.Unmarshal(sb.Args, &dcs)
 		if err != nil {
 			return nil, err

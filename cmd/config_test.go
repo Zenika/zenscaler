@@ -14,16 +14,16 @@ func openAndParseConfig(t *testing.T, path string) {
 	assert.Nil(t, err)
 }
 
-func TestConfigDockerComposeHAP(t *testing.T) {
+func TestConfigDockerComposeCmdHAP(t *testing.T) {
 	openAndParseConfig(t, "./../examples/docker-compose/hap")
 }
-func TestConfigDockerComposeProm(t *testing.T) {
+func TestConfigDockerComposeCmdProm(t *testing.T) {
 	openAndParseConfig(t, "./../examples/docker-compose/prom")
 }
-func TestConfigDockerComposeTraefik(t *testing.T) {
+func TestConfigDockerComposeCmdTraefik(t *testing.T) {
 	openAndParseConfig(t, "./../examples/docker-compose/traefik")
 }
-func TestConfigDockerComposeTraefikTLS(t *testing.T) {
+func TestConfigDockerComposeCmdTraefikTLS(t *testing.T) {
 	openAndParseConfig(t, "./../examples/docker-compose/traefik-tls")
 }
 func TestConfigDockerServiceHelloWorld(t *testing.T) {

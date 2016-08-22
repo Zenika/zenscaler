@@ -14,7 +14,7 @@ import (
 
 var MockConf = &types.Configuration{
 	Scalers: map[string]types.Scaler{
-		"whoami-compose": &scaler.ComposeScaler{
+		"whoami-compose": &scaler.ComposeCmdScaler{
 			ServiceName: "whoami",
 		},
 	},

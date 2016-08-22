@@ -3,7 +3,7 @@ orchestrator:
     endpoint: "unix:///var/run/docker.sock"
 scalers:
     dc-web:
-        type: "docker-compose"
+        type: "docker-compose-cmd"
         project: "hap"
         target: "web"
         config: "docker-compose.yaml"

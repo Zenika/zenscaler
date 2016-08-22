@@ -100,10 +100,10 @@ func parseScalers(config *types.Configuration) error {
 		log.Info("Add scaler [" + name + "]")
 		var s = scalers.Sub(name)
 		switch s.GetString("type") {
-		case "docker-compose":
-			cs, err := parseScalerDockerCompose(s)
+		case "docker-compose-cmd":
+			cs, err := parseScalerDockerComposeCmd(s)
 			if err != nil {
-				return fmt.Errorf("cannot create docker-compose scaler [%s]: %s", name, err)
+				return fmt.Errorf("cannot create docker-compose-cmd scaler [%s]: %s", name, err)
 			}
 			config.Scalers[name] = cs
 		case "docker-service":
@@ -119,8 +119,8 @@ func parseScalers(config *types.Configuration) error {
 	return nil
 }
 
-func parseScalerDockerCompose(s *viper.Viper) (*scaler.ComposeScaler, error) {
-	cs, err := scaler.NewComposeScaler(s.GetString("target"), s.GetString("project"), s.GetString("config"))
+func parseScalerDockerComposeCmd(s *viper.Viper) (*scaler.ComposeCmdScaler, error) {
+	cs, err := scaler.NewComposeCmdScaler(s.GetString("target"), s.GetString("project"), s.GetString("config"))
 	if err != nil {
 		return nil, err
 	}

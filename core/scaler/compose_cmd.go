@@ -13,8 +13,8 @@ import (
 	"github.com/Zenika/zscaler/core/tls"
 )
 
-// ComposeScaler executer docker-compose CLI
-type ComposeScaler struct {
+// ComposeCmdScaler executer docker-compose CLI
+type ComposeCmdScaler struct {
 	ServiceName       string `json:"service"`
 	ConfigFile        string `json:"config"`
 	ProjectName       string `json:"project"`
@@ -26,8 +26,8 @@ type ComposeScaler struct {
 	env               []string
 }
 
-// NewComposeScaler build a scaler
-func NewComposeScaler(name, project, configFilePath string) (*ComposeScaler, error) {
+// NewComposeCmdScaler build a scaler
+func NewComposeCmdScaler(name, project, configFilePath string) (*ComposeCmdScaler, error) {
 	// TODO need to gather containers, add an INIT ?
 	// TODO check for file at provided location
 	switch "" { // check missing parameter
@@ -38,7 +38,7 @@ func NewComposeScaler(name, project, configFilePath string) (*ComposeScaler, err
 	case project:
 		return nil, errors.New("No project specified")
 	}
-	cs := &ComposeScaler{
+	cs := &ComposeCmdScaler{
 		ServiceName:       name,
 		ConfigFile:        configFilePath, // need check
 		ProjectName:       project,
@@ -61,12 +61,12 @@ func NewComposeScaler(name, project, configFilePath string) (*ComposeScaler, err
 }
 
 // Describe scaler
-func (s *ComposeScaler) Describe() string {
+func (s *ComposeCmdScaler) Describe() string {
 	return "Exec docker-compose scaler"
 }
 
 // JSON encoding
-func (s *ComposeScaler) JSON() ([]byte, error) {
+func (s *ComposeCmdScaler) JSON() ([]byte, error) {
 	encoded, err := json.Marshal(*s)
 	if err != nil {
 		return nil, err
@@ -75,7 +75,7 @@ func (s *ComposeScaler) JSON() ([]byte, error) {
 }
 
 // Up using doker compose scale
-func (s *ComposeScaler) Up() error {
+func (s *ComposeCmdScaler) Up() error {
 	upRunningContainers := s.RunningContainers + 1
 	if upRunningContainers > s.UpperCountLimit {
 		s.getLogger().Debug("cannot scale up: maximum count achieved")
@@ -91,7 +91,7 @@ func (s *ComposeScaler) Up() error {
 }
 
 // Down using doker compose scale
-func (s *ComposeScaler) Down() (err error) {
+func (s *ComposeCmdScaler) Down() (err error) {
 	downRunningContainers := s.RunningContainers - 1
 	if downRunningContainers < s.LowerCountLimit {
 		s.getLogger().Debug("cannot scale down: minimum count achieved")
@@ -107,7 +107,7 @@ func (s *ComposeScaler) Down() (err error) {
 }
 
 // build commands environnement
-func (s *ComposeScaler) buildEnv() {
+func (s *ComposeCmdScaler) buildEnv() {
 	s.env = os.Environ()
 	s.env = append(s.env, fmt.Sprintf("DOCKER_HOST=%s", core.Config.Orchestrator.Endpoint))
 	s.env = append(s.env, fmt.Sprintf("COMPOSE_PROJECT_NAME=%s", s.ProjectName))
@@ -117,7 +117,7 @@ func (s *ComposeScaler) buildEnv() {
 	}
 }
 
-func (s *ComposeScaler) execComposeCmd(targetRunningContainers uint64) error {
+func (s *ComposeCmdScaler) execComposeCmd(targetRunningContainers uint64) error {
 	// #nosec TODO replace with libcompose API
 	downCmd := exec.Command("docker-compose", "-f", s.ConfigFile, "scale", s.ServiceName+"="+strconv.FormatUint(targetRunningContainers, 64))
 	downCmd.Env = s.env
@@ -129,7 +129,7 @@ func (s *ComposeScaler) execComposeCmd(targetRunningContainers uint64) error {
 	return nil
 }
 
-func (s *ComposeScaler) getLogger() *log.Entry {
+func (s *ComposeCmdScaler) getLogger() *log.Entry {
 	return log.WithFields(log.Fields{
 		"service": s.ServiceName,
 		"count":   s.RunningContainers,

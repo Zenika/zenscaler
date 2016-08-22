@@ -107,20 +107,29 @@ func parseScalers(config *types.Configuration) error {
 			}
 			// set optional parameter
 			if s.IsSet("upper_count_limit") {
-				cs.UpperCountLimit = s.GetInt("upper_count_limit")
+				cs.UpperCountLimit = uint64(s.GetInt("upper_count_limit"))
 			}
 			if s.IsSet("lower_count_limit") {
-				cs.LowerCountLimit = s.GetInt("lower_count_limit")
+				cs.LowerCountLimit = uint64(s.GetInt("lower_count_limit"))
 			}
 			config.Scalers[name] = cs
 		case "docker-service":
 			if s.GetString("service") == "" {
 				return errors.New("No service specified for docker-service scaler [" + name + "]")
 			}
-			config.Scalers[name] = &scaler.ServiceScaler{
-				ServiceID:    s.GetString("service"),
-				EngineSocket: viper.GetString("endpoint"),
+			ss := &scaler.ServiceScaler{
+				ServiceID:       s.GetString("service"),
+				EngineSocket:    viper.GetString("endpoint"),
+				LowerCountLimit: 1,
+				UpperCountLimit: 0,
 			}
+			if s.IsSet("upper_count_limit") {
+				ss.UpperCountLimit = uint64(s.GetInt("upper_count_limit"))
+			}
+			if s.IsSet("lower_count_limit") {
+				ss.LowerCountLimit = uint64(s.GetInt("lower_count_limit"))
+			}
+			config.Scalers[name] = ss
 		case "":
 			return fmt.Errorf("Unknown scaler type: %s\n", s.GetString("type"))
 		}

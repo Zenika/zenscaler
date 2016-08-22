@@ -17,8 +17,8 @@ import (
 type ServiceScaler struct {
 	ServiceID       string `json:"service"`
 	EngineSocket    string `json:"socket"`
-	UpperCountLimit int    `json:"UpperCountLimit"`
-	LowerCountLimit int    `json:"LowerCountLimit"`
+	UpperCountLimit uint64 `json:"upperCountLimit"`
+	LowerCountLimit uint64 `json:"lowerCountLimit"`
 	cli             *client.Client
 }
 
@@ -74,8 +74,8 @@ func (s *ServiceScaler) scaleService(scale func(uint64) uint64) error {
 		"target":  target,
 	})
 
-	// check boundaries
-	if target > uint64(s.UpperCountLimit) || target < uint64(s.LowerCountLimit) {
+	// check boundaries, UpperCountLimit at 0 mean uncapped maximum
+	if (s.UpperCountLimit != 0 && target > s.UpperCountLimit) || target < s.LowerCountLimit {
 		logger.Debugf("cannot scale to target: limit count achieved")
 		return nil
 	}

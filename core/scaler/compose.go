@@ -18,9 +18,9 @@ type ComposeScaler struct {
 	ServiceName       string `json:"service"`
 	ConfigFile        string `json:"config"`
 	ProjectName       string `json:"project"`
-	RunningContainers int    `json:"running"`
-	UpperCountLimit   int    `json:"UpperCountLimit"`
-	LowerCountLimit   int    `json:"LowerCountLimit"`
+	RunningContainers uint64 `json:"running"`
+	UpperCountLimit   uint64 `json:"upperCountLimit"`
+	LowerCountLimit   uint64 `json:"lowerCountLimit"`
 	withTLS           bool
 	tlsCertsPath      string
 	env               []string
@@ -44,7 +44,7 @@ func NewComposeScaler(name, project, configFilePath string) (*ComposeScaler, err
 		ProjectName:       project,
 		RunningContainers: 2,     // should be discovered
 		withTLS:           false, // enforcing default
-		UpperCountLimit:   -1,    // default to unlimited
+		UpperCountLimit:   0,     // default to unlimited
 		LowerCountLimit:   1,     // default to one, ensuring service avaibility
 	}
 	// TLS configuration is checked beforehand but we need to perform additional checks because of docker-compose limitations
@@ -117,9 +117,9 @@ func (s *ComposeScaler) buildEnv() {
 	}
 }
 
-func (s *ComposeScaler) execComposeCmd(targetRunningContainers int) error {
+func (s *ComposeScaler) execComposeCmd(targetRunningContainers uint64) error {
 	// #nosec TODO replace with libcompose API
-	downCmd := exec.Command("docker-compose", "-f", s.ConfigFile, "scale", s.ServiceName+"="+strconv.Itoa(targetRunningContainers))
+	downCmd := exec.Command("docker-compose", "-f", s.ConfigFile, "scale", s.ServiceName+"="+strconv.FormatUint(targetRunningContainers, 64))
 	downCmd.Env = s.env
 	out, err := downCmd.CombinedOutput()
 	if err != nil {

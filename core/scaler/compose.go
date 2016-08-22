@@ -2,6 +2,7 @@ package scaler
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -10,7 +11,6 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/Zenika/zscaler/core"
 	"github.com/Zenika/zscaler/core/tls"
-	"github.com/Zenika/zscaler/core/types"
 )
 
 // ComposeScaler executer docker-compose CLI
@@ -18,22 +18,34 @@ type ComposeScaler struct {
 	ServiceName       string `json:"service"`
 	ConfigFile        string `json:"config"`
 	ProjectName       string `json:"project"`
-	RunningContainers int    `json:"running"`
+	RunningContainers uint64 `json:"running"`
+	UpperCountLimit   uint64 `json:"upperCountLimit"`
+	LowerCountLimit   uint64 `json:"lowerCountLimit"`
 	withTLS           bool
 	tlsCertsPath      string
 	env               []string
 }
 
 // NewComposeScaler build a scaler
-func NewComposeScaler(name, project, ConfigFilePath string) (types.Scaler, error) {
+func NewComposeScaler(name, project, configFilePath string) (*ComposeScaler, error) {
 	// TODO need to gather containers, add an INIT ?
 	// TODO check for file at provided location
+	switch "" { // check missing parameter
+	case name:
+		return nil, errors.New("No target specified")
+	case configFilePath:
+		return nil, errors.New("No configuration file path specified")
+	case project:
+		return nil, errors.New("No project specified")
+	}
 	cs := &ComposeScaler{
 		ServiceName:       name,
-		ConfigFile:        ConfigFilePath, // need check
+		ConfigFile:        configFilePath, // need check
 		ProjectName:       project,
-		RunningContainers: 3,     // should be discovered
+		RunningContainers: 2,     // should be discovered
 		withTLS:           false, // enforcing default
+		UpperCountLimit:   0,     // default to unlimited
+		LowerCountLimit:   1,     // default to one, ensuring service avaibility
 	}
 	// TLS configuration is checked beforehand but we need to perform additional checks because of docker-compose limitations
 	if core.Config.Orchestrator.TLS {
@@ -64,45 +76,34 @@ func (s *ComposeScaler) JSON() ([]byte, error) {
 
 // Up using doker compose scale
 func (s *ComposeScaler) Up() error {
-	// #nosec TODO replace with libcompose API
-	upCmd := exec.Command("docker-compose", "-f", s.ConfigFile, "scale", s.ServiceName+"="+strconv.Itoa(s.RunningContainers+1))
-	upCmd.Env = s.env
-	out, err := upCmd.CombinedOutput()
+	upRunningContainers := s.RunningContainers + 1
+	if upRunningContainers > s.UpperCountLimit {
+		s.getLogger().Debug("cannot scale up: maximum count achieved")
+		return nil
+	}
+	err := s.execComposeCmd(upRunningContainers)
 	if err != nil {
-		log.Errorf("out: %s\nerr: %s", out, err)
 		return err
 	}
 	s.RunningContainers++
-	log.WithFields(log.Fields{
-		"service": s.ServiceName,
-		"count":   s.RunningContainers,
-	}).Infof("scale up")
+	s.getLogger().Infof("scale up")
 	return nil
 }
 
 // Down using doker compose scale
-func (s *ComposeScaler) Down() error {
-	if s.RunningContainers < 2 {
-		log.WithFields(log.Fields{
-			"service": s.ServiceName,
-			"count":   s.RunningContainers,
-		}).Debug("cannot scale down: minimum count achieved")
-		return nil
+func (s *ComposeScaler) Down() (err error) {
+	downRunningContainers := s.RunningContainers - 1
+	if downRunningContainers < s.LowerCountLimit {
+		s.getLogger().Debug("cannot scale down: minimum count achieved")
+		return
 	}
-	// #nosec TODO replace with libcompose API
-	downCmd := exec.Command("docker-compose", "-f", s.ConfigFile, "scale", s.ServiceName+"="+strconv.Itoa(s.RunningContainers-1))
-	downCmd.Env = s.env
-	out, err := downCmd.CombinedOutput()
+	err = s.execComposeCmd(downRunningContainers)
 	if err != nil {
-		log.Errorf("out: %s\nerr: %v", out, err)
-		return err
+		return
 	}
 	s.RunningContainers--
-	log.WithFields(log.Fields{
-		"service": s.ServiceName,
-		"count":   s.RunningContainers,
-	}).Infof("scale down")
-	return nil
+	s.getLogger().Infof("scale down")
+	return
 }
 
 // build commands environnement
@@ -114,4 +115,23 @@ func (s *ComposeScaler) buildEnv() {
 		s.env = append(s.env, fmt.Sprintf("DOCKER_CERT_PATH=%s", s.tlsCertsPath))
 		s.env = append(s.env, fmt.Sprintf("DOCKER_TLS_VERIFY=%s", "yes"))
 	}
+}
+
+func (s *ComposeScaler) execComposeCmd(targetRunningContainers uint64) error {
+	// #nosec TODO replace with libcompose API
+	downCmd := exec.Command("docker-compose", "-f", s.ConfigFile, "scale", s.ServiceName+"="+strconv.FormatUint(targetRunningContainers, 64))
+	downCmd.Env = s.env
+	out, err := downCmd.CombinedOutput()
+	if err != nil {
+		log.Errorf("out: %s\nerr: %v", out, err)
+		return err
+	}
+	return nil
+}
+
+func (s *ComposeScaler) getLogger() *log.Entry {
+	return log.WithFields(log.Fields{
+		"service": s.ServiceName,
+		"count":   s.RunningContainers,
+	})
 }

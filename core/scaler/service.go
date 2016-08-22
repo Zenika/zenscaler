@@ -15,9 +15,11 @@ import (
 
 // ServiceScaler work with docker 1.12 swarm services (API 1.24)
 type ServiceScaler struct {
-	ServiceID    string `json:"service"`
-	EngineSocket string `json:"socket"`
-	cli          *client.Client
+	ServiceID       string `json:"service"`
+	EngineSocket    string `json:"socket"`
+	UpperCountLimit uint64 `json:"upperCountLimit"`
+	LowerCountLimit uint64 `json:"lowerCountLimit"`
+	cli             *client.Client
 }
 
 // Describe scaler
@@ -45,10 +47,7 @@ func (s *ServiceScaler) Up() error {
 // Down using API on swarm socket
 func (s *ServiceScaler) Down() error {
 	err := s.scaleService(func(n uint64) uint64 {
-		if n > 1 {
-			return n - 1
-		}
-		return n
+		return n - 1
 	})
 	return err
 }
@@ -69,11 +68,18 @@ func (s *ServiceScaler) scaleService(scale func(uint64) uint64) error {
 		return fmt.Errorf("scale can only be used with replicated mode")
 	}
 	target := scale(*serviceMode.Replicated.Replicas)
-	log.WithFields(log.Fields{
+	logger := log.WithFields(log.Fields{
 		"service": s.ServiceID,
 		"count":   *serviceMode.Replicated.Replicas,
 		"target":  target,
-	}).Debugf("scale service")
+	})
+
+	// check boundaries, UpperCountLimit at 0 mean uncapped maximum
+	if (s.UpperCountLimit != 0 && target > s.UpperCountLimit) || target < s.LowerCountLimit {
+		logger.Debugf("cannot scale to target: limit count achieved")
+		return nil
+	}
+	logger.Debugf("scale service to new target")
 	serviceMode.Replicated.Replicas = &target
 
 	err = cli.ServiceUpdate(ctx, service.ID, service.Version, service.Spec, types.ServiceUpdateOptions{})

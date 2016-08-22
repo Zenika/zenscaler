@@ -24,7 +24,9 @@ func TestBuildComposeScaler(t *testing.T) {
     "args": {
         "service":"whoami",
         "project":"test",
-        "config":"/dummy/path"
+        "config":"/dummy/path",
+		"upperCountLimit":0,
+		"lowerCountLimit":1
     }
 }`
 	err := configAndBuildScaler(t, input)
@@ -38,7 +40,9 @@ func TestBuildComposeScalerBadType(t *testing.T) {
     "args": {
         "service":"whoami",
         "project":"test",
-        "config":"/dummy/path"
+        "config":"/dummy/path",
+		"upperCountLimit":0,
+		"lowerCountLimit":1
     }
 }`
 	err := configAndBuildScaler(t, input)

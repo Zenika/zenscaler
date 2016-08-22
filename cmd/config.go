@@ -101,33 +101,56 @@ func parseScalers(config *types.Configuration) error {
 		var s = scalers.Sub(name)
 		switch s.GetString("type") {
 		case "docker-compose":
-			if s.GetString("config") == "" {
-				return errors.New("No config specified for docker-compose scaler [" + name + "]")
-			}
-			if s.GetString("target") == "" {
-				return errors.New("No target specified for docker-compose scaler [" + name + "]")
-			}
-			if s.GetString("project") == "" {
-				return errors.New("No project specified for docker-compose scaler [" + name + "]")
-			}
-			cs, err := scaler.NewComposeScaler(s.GetString("target"), s.GetString("project"), s.GetString("config"))
+			cs, err := parseScalerDockerCompose(s)
 			if err != nil {
 				return fmt.Errorf("cannot create docker-compose scaler [%s]: %s", name, err)
 			}
 			config.Scalers[name] = cs
 		case "docker-service":
-			if s.GetString("service") == "" {
-				return errors.New("No service specified for docker-service scaler [" + name + "]")
+			ss, err := parseScalerDockerService(s)
+			if err != nil {
+				return fmt.Errorf("cannot create docker-service scaler [%s]: %s", name, err)
 			}
-			config.Scalers[name] = &scaler.ServiceScaler{
-				ServiceID:    s.GetString("service"),
-				EngineSocket: viper.GetString("endpoint"),
-			}
+			config.Scalers[name] = ss
 		case "":
 			return fmt.Errorf("Unknown scaler type: %s\n", s.GetString("type"))
 		}
 	}
 	return nil
+}
+
+func parseScalerDockerCompose(s *viper.Viper) (*scaler.ComposeScaler, error) {
+	cs, err := scaler.NewComposeScaler(s.GetString("target"), s.GetString("project"), s.GetString("config"))
+	if err != nil {
+		return nil, err
+	}
+	// set optional parameter
+	if s.IsSet("upper_count_limit") {
+		cs.UpperCountLimit = uint64(s.GetInt("upper_count_limit"))
+	}
+	if s.IsSet("lower_count_limit") {
+		cs.LowerCountLimit = uint64(s.GetInt("lower_count_limit"))
+	}
+	return cs, nil
+}
+
+func parseScalerDockerService(s *viper.Viper) (*scaler.ServiceScaler, error) {
+	if s.GetString("service") == "" {
+		return nil, errors.New("No service specified")
+	}
+	ss := &scaler.ServiceScaler{
+		ServiceID:       s.GetString("service"),
+		EngineSocket:    viper.GetString("endpoint"),
+		LowerCountLimit: 1,
+		UpperCountLimit: 0,
+	}
+	if s.IsSet("upper_count_limit") {
+		ss.UpperCountLimit = uint64(s.GetInt("upper_count_limit"))
+	}
+	if s.IsSet("lower_count_limit") {
+		ss.LowerCountLimit = uint64(s.GetInt("lower_count_limit"))
+	}
+	return ss, nil
 }
 
 func parseRules(config *types.Configuration) error {

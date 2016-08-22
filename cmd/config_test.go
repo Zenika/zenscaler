@@ -9,7 +9,8 @@ import (
 
 // Open all configuration files and parse them
 func openAndParseConfig(t *testing.T, path string) {
-	viper.AddConfigPath(path)
+	viper.SetConfigType("yaml")
+	viper.SetConfigFile(path + "/config.yaml")
 	_, err := parseConfig()
 	assert.Nil(t, err)
 }

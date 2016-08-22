@@ -26,6 +26,7 @@ var dumpConfigCmd = &cobra.Command{
 	Short: "Dump parsed config file to stdout",
 	Long:  `Check, parse and dump the configuration to the standart output`,
 	Run: func(cmd *cobra.Command, args []string) {
+		setConfigPath()
 		config, err := parseConfig()
 		if err != nil {
 			log.Fatalf("Error in config file: %s", err)
@@ -35,12 +36,14 @@ var dumpConfigCmd = &cobra.Command{
 	},
 }
 
-func parseConfig() (*types.Configuration, error) {
-	// parse config file
+func setConfigPath() {
 	viper.SetConfigName("config") // name of config file (without extension)
 	viper.AddConfigPath(".")      // look for config in the working directory
-	err := viper.ReadInConfig()   // Find and read the config file
-	if err != nil {               // Handle errors reading the config file
+}
+
+func parseConfig() (*types.Configuration, error) {
+	err := viper.ReadInConfig() // Find and read the config file
+	if err != nil {             // Handle errors reading the config file
 		return nil, fmt.Errorf("Cannot read config file: %s \n", err)
 	}
 

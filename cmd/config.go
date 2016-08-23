@@ -18,7 +18,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-const defaultMapEnties = 5
+const defaultMapEntries = 5
 
 // DumpConfigCmd definition
 var dumpConfigCmd = &cobra.Command{

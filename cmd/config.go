@@ -49,8 +49,8 @@ func parseConfig() (*types.Configuration, error) {
 
 	// global configuration structure
 	var config = &types.Configuration{
-		Scalers: make(map[string]types.Scaler, defaultMapEnties),
-		Rules:   make(map[string]types.Rule, defaultMapEnties),
+		Scalers: make(map[string]types.Scaler, defaultMapEntries),
+		Rules:   make(map[string]types.Rule, defaultMapEntries),
 	}
 	// set it as global
 	core.Config = config

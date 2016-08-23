@@ -11,4 +11,3 @@ services:
       - .:/var/run/
     ports:
       - 80:80
-

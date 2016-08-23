@@ -30,7 +30,7 @@ services:
     - "traefik.frontend.rule=Host:whoami2.docker.localhost"
 
  zscaler:
-  image: zscaler
+  image: zenika/zscaler:latest
   command: -d start
   networks:
     - public

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"strconv"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/Zenika/zscaler/core"
@@ -119,7 +118,7 @@ func (s *ComposeCmdScaler) buildEnv() {
 
 func (s *ComposeCmdScaler) execComposeCmd(targetRunningContainers uint64) error {
 	// #nosec TODO replace with libcompose API
-	downCmd := exec.Command("docker-compose", "-f", s.ConfigFile, "scale", s.ServiceName+"="+strconv.FormatUint(targetRunningContainers, 64))
+	downCmd := exec.Command("docker-compose", "-f", s.ConfigFile, "scale", s.ServiceName+"="+fmt.Sprintf("%d", targetRunningContainers))
 	downCmd.Env = s.env
 	out, err := downCmd.CombinedOutput()
 	if err != nil {

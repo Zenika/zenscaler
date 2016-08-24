@@ -6,12 +6,12 @@ orchestrator:
     tls-key: "./examples/docker-compose/traefik/key.pem"
 scalers:
     whoami-compose:
-        type: "docker-compose"
+        type: "docker-compose-cmd"
         project: "traefik-tls"
         target: "whoami"
         config: "docker-compose.yaml"
     whoami2-compose:
-        type: "docker-compose"
+        type: "docker-compose-cmd"
         project: "traefik-tls"
         target: "whoami2"
         config: "docker-compose.yaml"

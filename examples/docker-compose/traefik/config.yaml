@@ -2,14 +2,14 @@ orchestrator:
     engine: "docker"
 scalers:
     whoami-compose:
-        type: "docker-compose"
+        type: "docker-compose-cmd"
         project: "traefik"
         target: "whoami"
         config: "docker-compose.yaml"
         upper_count_limit: 6
         lower_count_limit: 1
     whoami2-compose:
-        type: "docker-compose"
+        type: "docker-compose-cmd"
         project: "traefik"
         target: "whoami2"
         config: "docker-compose.yaml"

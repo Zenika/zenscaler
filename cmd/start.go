@@ -21,6 +21,7 @@ var startCmd = &cobra.Command{
 		} else {
 			gin.SetMode(gin.ReleaseMode)
 		}
+		setConfigPath()
 		var err error
 		core.Config, err = parseConfig()
 		if err != nil {

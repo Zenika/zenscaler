@@ -17,9 +17,9 @@ func configAndBuildScaler(t *testing.T, input string) error {
 	return err
 }
 
-func TestBuildComposeScaler(t *testing.T) {
+func TestBuildComposeCmdScaler(t *testing.T) {
 	const input = `{
-    "type":"docker-compose",
+    "type":"docker-compose-cmd",
     "name":"testing",
     "args": {
         "service":"whoami",
@@ -33,7 +33,7 @@ func TestBuildComposeScaler(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func TestBuildComposeScalerBadType(t *testing.T) {
+func TestBuildComposeCmdScalerBadType(t *testing.T) {
 	const input = `{
     "type":"badtype",
     "name":"testing",

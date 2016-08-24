@@ -47,12 +47,12 @@ orchestrator:
     tls-key: "key.pem"
 scalers:                               # scaler section
     whoami-compose:                    # custom id
-        type: "docker-compose"         # what do we use to scale the service ?
+        type: "docker-compose-cmd"     # what do we use to scale the service ?
         project: "traefik"             # parameter for docker-compose
         target: "whoami"               # parameter for docker-compose
         config: "docker-compose.yaml"  # parameter for docker-compose
     whoami2-compose:
-        type: "docker-compose"
+        type: "docker-compose-cmd"
         project: "traefik"
         target: "whoami2"
         config: "docker-compose.yaml"

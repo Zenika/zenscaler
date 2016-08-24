@@ -68,7 +68,7 @@ func TestIntegration(t *testing.T) {
 
 	// add docker-compose scaler named 'compose'
 	composeScalerJSON := `{
-    "type":"docker-compose",
+    "type":"docker-compose-cmd",
     "name":"compose",
     "args": {
         "service":"whoami",

@@ -18,7 +18,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-const defaultMapEnties = 5
+const defaultMapEntries = 5
 
 // DumpConfigCmd definition
 var dumpConfigCmd = &cobra.Command{
@@ -26,6 +26,7 @@ var dumpConfigCmd = &cobra.Command{
 	Short: "Dump parsed config file to stdout",
 	Long:  `Check, parse and dump the configuration to the standart output`,
 	Run: func(cmd *cobra.Command, args []string) {
+		setConfigPath()
 		config, err := parseConfig()
 		if err != nil {
 			log.Fatalf("Error in config file: %s", err)
@@ -35,19 +36,21 @@ var dumpConfigCmd = &cobra.Command{
 	},
 }
 
-func parseConfig() (*types.Configuration, error) {
-	// parse config file
+func setConfigPath() {
 	viper.SetConfigName("config") // name of config file (without extension)
 	viper.AddConfigPath(".")      // look for config in the working directory
-	err := viper.ReadInConfig()   // Find and read the config file
-	if err != nil {               // Handle errors reading the config file
+}
+
+func parseConfig() (*types.Configuration, error) {
+	err := viper.ReadInConfig() // Find and read the config file
+	if err != nil {             // Handle errors reading the config file
 		return nil, fmt.Errorf("Cannot read config file: %s \n", err)
 	}
 
 	// global configuration structure
 	var config = &types.Configuration{
-		Scalers: make(map[string]types.Scaler, defaultMapEnties),
-		Rules:   make(map[string]types.Rule, defaultMapEnties),
+		Scalers: make(map[string]types.Scaler, defaultMapEntries),
+		Rules:   make(map[string]types.Rule, defaultMapEntries),
 	}
 	// set it as global
 	core.Config = config
@@ -100,10 +103,10 @@ func parseScalers(config *types.Configuration) error {
 		log.Info("Add scaler [" + name + "]")
 		var s = scalers.Sub(name)
 		switch s.GetString("type") {
-		case "docker-compose":
-			cs, err := parseScalerDockerCompose(s)
+		case "docker-compose-cmd":
+			cs, err := parseScalerDockerComposeCmd(s)
 			if err != nil {
-				return fmt.Errorf("cannot create docker-compose scaler [%s]: %s", name, err)
+				return fmt.Errorf("cannot create docker-compose-cmd scaler [%s]: %s", name, err)
 			}
 			config.Scalers[name] = cs
 		case "docker-service":
@@ -119,8 +122,8 @@ func parseScalers(config *types.Configuration) error {
 	return nil
 }
 
-func parseScalerDockerCompose(s *viper.Viper) (*scaler.ComposeScaler, error) {
-	cs, err := scaler.NewComposeScaler(s.GetString("target"), s.GetString("project"), s.GetString("config"))
+func parseScalerDockerComposeCmd(s *viper.Viper) (*scaler.ComposeCmdScaler, error) {
+	cs, err := scaler.NewComposeCmdScaler(s.GetString("target"), s.GetString("project"), s.GetString("config"))
 	if err != nil {
 		return nil, err
 	}

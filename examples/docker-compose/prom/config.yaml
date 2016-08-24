@@ -3,7 +3,7 @@ orchestrator:
     endpoint: "unix:///var/run/docker.sock"
 scalers:
     whoami-compose:
-        type: "docker-compose"
+        type: "docker-compose-cmd"
         project: "prom"
         target: "whoami"
         config: "docker-compose.yaml"

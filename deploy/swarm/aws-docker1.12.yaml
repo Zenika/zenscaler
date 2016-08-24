@@ -97,21 +97,26 @@
     - name: Create systemd docker config file socket.conf
       copy:
         # TODO replace this using a template
-        content: "[Service]\nExecStart=\nExecStart=/usr/bin/docker daemon -H fd:// -H tcp://0.0.0.0:4001"
+        content: "[Service]\nExecStart=\nExecStart=/usr/bin/docker daemon -H fd:// -H tcp://0.0.0.0:40001"
         dest: /etc/systemd/system/docker.service.d/socket.conf
 
     - name: Reload systemctl
       command: "systemctl daemon-reload"
 
-    - name: Restart Docker service 
+    - name: Restart Docker service
       service: name=docker state=restarted
 
     - name: Start swarm cluster master
       shell: "docker swarm init --listen-addr :2377"
+      ignore_errors: yes
 
     - shell: "docker info"
       register: result
     - debug: var=result verbosity=2
+
+    - name: Get join token
+      shell: "docker swarm join-token -q worker"
+      register: token
 
 - name: Setup nodes
   hosts: swarm_node
@@ -122,7 +127,7 @@
 
   tasks:
     - name: Node join swarm
-      shell: "docker swarm join {{ groups['swarm_manager'][0] }}:2377"
+      shell: "docker swarm join --token {{ hostvars[groups['swarm_manager'][0]]['token']['stdout'] }} {{ groups['swarm_manager'][0] }}:2377"
 
 - name: Check
   hosts: swarm_manager[0]

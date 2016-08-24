@@ -76,7 +76,7 @@ func (s *ComposeCmdScaler) JSON() ([]byte, error) {
 // Up using doker compose scale
 func (s *ComposeCmdScaler) Up() error {
 	upRunningContainers := s.RunningContainers + 1
-	if upRunningContainers > s.UpperCountLimit {
+	if upRunningContainers > s.UpperCountLimit && s.UpperCountLimit != 0 {
 		s.getLogger().Debug("cannot scale up: maximum count achieved")
 		return nil
 	}

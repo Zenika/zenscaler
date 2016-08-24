@@ -51,6 +51,8 @@ scalers:                               # scaler section
         project: "traefik"             # parameter for docker-compose
         target: "whoami"               # parameter for docker-compose
         config: "docker-compose.yaml"  # parameter for docker-compose
+        upper_count_limit: 0  # 0 mean unlimited, default
+        lower_count_limit: 1  # default to ensure availability
     whoami2-compose:
         type: "docker-compose-cmd"
         project: "traefik"

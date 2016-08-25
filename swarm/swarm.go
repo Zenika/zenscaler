@@ -11,8 +11,8 @@ import (
 	"github.com/docker/engine-api/types/filters"
 	"golang.org/x/net/context"
 
-	"github.com/Zenika/zscaler/core"
-	"github.com/Zenika/zscaler/core/tls"
+	"github.com/Zenika/zenscaler/core"
+	"github.com/Zenika/zenscaler/core/tls"
 )
 
 // Provider wrapper for docker API client

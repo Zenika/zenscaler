@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Zenika/zscaler/core"
-	"github.com/Zenika/zscaler/core/probe"
-	"github.com/Zenika/zscaler/core/rule"
-	"github.com/Zenika/zscaler/swarm"
+	"github.com/Zenika/zenscaler/core"
+	"github.com/Zenika/zenscaler/core/probe"
+	"github.com/Zenika/zenscaler/core/rule"
+	"github.com/Zenika/zenscaler/swarm"
 	"github.com/spf13/viper"
 )
 

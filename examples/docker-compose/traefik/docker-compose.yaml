@@ -3,7 +3,7 @@ version: '2'
 services:
  traefik:
   image: traefik
-  command: --web --docker --docker.domain=docker.localhost --logLevel=DEBUG
+  command: --web --docker --docker.domain=docker.localhost --logLevel=WARNING
   networks:
     - public
   ports:
@@ -29,8 +29,8 @@ services:
     - "traefik.backend=whoami2"
     - "traefik.frontend.rule=Host:whoami2.docker.localhost"
 
- zscaler:
-  image: zenika/zscaler:latest
+ zenscaler:
+  image: zenika/zenscaler:latest
   command: -d start
   networks:
     - public

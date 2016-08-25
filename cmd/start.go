@@ -1,9 +1,9 @@
 package cmd
 
 import (
-	"github.com/Zenika/zscaler/api"
-	"github.com/Zenika/zscaler/core"
-	"github.com/Zenika/zscaler/core/rule"
+	"github.com/Zenika/zenscaler/api"
+	"github.com/Zenika/zenscaler/core"
+	"github.com/Zenika/zenscaler/core/rule"
 	"github.com/gin-gonic/gin"
 
 	log "github.com/Sirupsen/logrus"

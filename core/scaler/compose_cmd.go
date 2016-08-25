@@ -8,8 +8,8 @@ import (
 	"os/exec"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/Zenika/zscaler/core"
-	"github.com/Zenika/zscaler/core/tls"
+	"github.com/Zenika/zenscaler/core"
+	"github.com/Zenika/zenscaler/core/tls"
 )
 
 // ComposeCmdScaler executer docker-compose CLI

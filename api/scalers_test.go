@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/Zenika/zscaler/core"
+	"github.com/Zenika/zenscaler/core"
 	"github.com/stretchr/testify/assert"
 )
 

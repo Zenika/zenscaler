@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/Zenika/zscaler/core"
-	"github.com/Zenika/zscaler/core/tls"
+	"github.com/Zenika/zenscaler/core"
+	"github.com/Zenika/zenscaler/core/tls"
 	"github.com/docker/engine-api/client"
 	"github.com/docker/engine-api/types"
 	"golang.org/x/net/context"

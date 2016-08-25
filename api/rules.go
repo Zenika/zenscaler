@@ -3,8 +3,8 @@ package api
 import (
 	"net/http"
 
-	"github.com/Zenika/zscaler/core"
-	"github.com/Zenika/zscaler/core/rule"
+	"github.com/Zenika/zenscaler/core"
+	"github.com/Zenika/zenscaler/core/rule"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"

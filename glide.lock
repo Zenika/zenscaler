@@ -1,70 +1,11 @@
-hash: 1b8200e28b6f568af7c0692a5e7602fb40836049bdb076a1fee86b3819d46dca
-updated: 2016-08-23T14:33:59.276831262+02:00
+hash: ca6e849094426afd1def3b2626603e213303285a1d92e1ae287843edd037d75e
+updated: 2016-08-25T15:31:01.744040996+02:00
 imports:
-- name: github.com/Azure/go-ansiterm
-  version: fa152c58bc15761d0200cb75fe958b89a9d4888e
-  subpackages:
-  - winterm
 - name: github.com/docker/distribution
-  version: 4107cdb63370e6b445e5d832b8d2768b8b6eb8c5
+  version: dea554fc7cce2f2e7af5b1e1d38e28c5e96e1d9e
   subpackages:
-  - context
   - digest
   - reference
-  - registry/api/errcode
-  - registry/api/v2
-  - registry/client
-  - registry/client/auth
-  - registry/client/transport
-  - registry/storage/cache
-  - registry/storage/cache/memory
-  - uuid
-- name: github.com/docker/docker
-  version: b97f985054b2eea3e9ee10cc8f10c5e61ded4f9b
-  subpackages:
-  - api/types/backend
-  - builder
-  - builder/dockerignore
-  - cliconfig
-  - cliconfig/configfile
-  - daemon/graphdriver
-  - image
-  - image/v1
-  - layer
-  - opts
-  - pkg/archive
-  - pkg/chrootarchive
-  - pkg/fileutils
-  - pkg/gitutils
-  - pkg/homedir
-  - pkg/httputils
-  - pkg/idtools
-  - pkg/ioutils
-  - pkg/jsonlog
-  - pkg/jsonmessage
-  - pkg/longpath
-  - pkg/mflag
-  - pkg/mount
-  - pkg/plugins
-  - pkg/plugins/transport
-  - pkg/pools
-  - pkg/progress
-  - pkg/promise
-  - pkg/random
-  - pkg/reexec
-  - pkg/signal
-  - pkg/stdcopy
-  - pkg/streamformatter
-  - pkg/stringid
-  - pkg/symlink
-  - pkg/system
-  - pkg/tarsum
-  - pkg/term
-  - pkg/term/windows
-  - pkg/urlutil
-  - reference
-  - registry
-  - runconfig/opts
 - name: github.com/docker/engine-api
   version: 2f8c367944a28130f3c2fb9f0aad7f1d5db952a9
   subpackages:
@@ -74,7 +15,6 @@ imports:
   - types
   - types/blkiodev
   - types/container
-  - types/events
   - types/filters
   - types/mount
   - types/network
@@ -93,25 +33,7 @@ imports:
 - name: github.com/docker/go-units
   version: eb879ae3e2b84e2a142af415b679ddeda47ec71c
 - name: github.com/docker/libcompose
-  version: c10fa1d7ef4e0fe05b2bc9ca7444ea421b1df236
-  subpackages:
-  - config
-  - docker
-  - docker/builder
-  - docker/client
-  - docker/network
-  - docker/volume
-  - labels
-  - logger
-  - lookup
-  - project
-  - project/events
-  - project/options
-  - utils
-  - version
-  - yaml
-- name: github.com/flynn/go-shlex
-  version: 3f9db97f856818214da2e1057f8ad84803971cff
+  version: 981fb65510b0a62e680368c7854f1e3358ca9ed5
 - name: github.com/fsnotify/fsnotify
   version: f12c6236fe7b5cf6bcf30e5935d08cb079d78334
 - name: github.com/gin-gonic/gin
@@ -123,10 +45,6 @@ imports:
   version: 2402d76f3d41f928c7902a765dfc872356dd3aad
   subpackages:
   - proto
-- name: github.com/gorilla/context
-  version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
-- name: github.com/gorilla/mux
-  version: cf79e51a62d8219d52060dfc1b4e810414ba2d15
 - name: github.com/hashicorp/hcl
   version: baeb59c710717b06aac1dbe2270e8192ec593244
   subpackages:
@@ -151,9 +69,8 @@ imports:
 - name: github.com/mitchellh/mapstructure
   version: ca63d7c062ee3c9f34db231e352b60012b4fd0c1
 - name: github.com/opencontainers/runc
-  version: 31d51c10e1ee92736556d33a0793ff37685a1172
+  version: 46d9535096662d8d6a734e4fdfc1c27ab03bc328
   subpackages:
-  - libcontainer/system
   - libcontainer/user
 - name: github.com/pelletier/go-buffruneio
   version: df1e16fde7fc330a0ca68167c23bf7ed6ac31d6d
@@ -173,29 +90,15 @@ imports:
 - name: github.com/spf13/cast
   version: e31f36ffc91a2ba9ddb72a4b6a607ff9b3d3cb63
 - name: github.com/spf13/cobra
-  version: 1f4717172e07e12150feb061b2ab847c3054f53f
+  version: 37c3f8060359192150945916cbc2d72bce804b4d
 - name: github.com/spf13/jwalterweatherman
   version: 33c24e77fb80341fe7130ee7c594256ff08ccc46
 - name: github.com/spf13/pflag
   version: 103ce5cd2042f2fe629c1957abb64ab3e7f50235
 - name: github.com/spf13/viper
   version: 7fb2782df3d83e0036cc89f461ed0422628776f4
-- name: github.com/vbatts/tar-split
-  version: 6810cedb21b2c3d0b9bb8f9af12ff2dc7a2f14df
-  subpackages:
-  - archive/tar
-  - tar/asm
-  - tar/storage
-- name: github.com/vdemeester/docker-events
-  version: be74d4929ec1ad118df54349fda4b0cba60f849b
-- name: github.com/xeipuuv/gojsonpointer
-  version: e0fe6f68307607d540ed8eac07a342c33fa1b54a
-- name: github.com/xeipuuv/gojsonreference
-  version: e02fc20de94c78484cd5ffb007f8af96be030a45
-- name: github.com/xeipuuv/gojsonschema
-  version: 4f624f6197547606054e042e7903db103585e151
 - name: golang.org/x/crypto
-  version: b35ccbc95a0eaae49fb65c5d627cb7149ed8d1ab
+  version: 351dc6a5bf92a5f2ae22fadeee08eb6a45aa2d93
   subpackages:
   - curve25519
   - ed25519

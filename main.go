@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/Zenika/zscaler/cmd"
+	"github.com/Zenika/zenscaler/cmd"
 )
 
 func main() {

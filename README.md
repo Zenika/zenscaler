@@ -1,7 +1,7 @@
-zscaler  [![CircleCI](https://circleci.com/gh/Zenika/zscaler/tree/master.svg?style=svg&circle-token=78b4c3db440a574eea374cc602addd51a6b5e249)](https://circleci.com/gh/Zenika/zscaler/tree/master) [![Go Report Card](https://goreportcard.com/badge/github.com/Zenika/zscaler)](https://goreportcard.com/report/github.com/Zenika/zscaler) [![GoDoc](https://godoc.org/github.com/Zenika/zscaler?status.svg)](https://godoc.org/github.com/Zenika/zscaler) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Zenika/zscaler/blob/master/LICENSE.md)
+zenscaler  [![CircleCI](https://circleci.com/gh/Zenika/zenscaler/tree/master.svg?style=svg&circle-token=78b4c3db440a574eea374cc602addd51a6b5e249)](https://circleci.com/gh/Zenika/zenscaler/tree/master) [![Go Report Card](https://goreportcard.com/badge/github.com/Zenika/zenscaler)](https://goreportcard.com/report/github.com/Zenika/zenscaler) [![GoDoc](https://godoc.org/github.com/Zenika/zenscaler?status.svg)](https://godoc.org/github.com/Zenika/zenscaler) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Zenika/zenscaler/blob/master/LICENSE.md)
 =======
 
-zscaler aims to be an environment-agnostic, simple and flexible scaler. It plugs itself on any existing infrastructure, probe metrics and scale services according to configured rules by issuing orders to orchestration engines.
+zenscaler aims to be an environment-agnostic, simple and flexible scaler. It plugs itself on any existing infrastructure, probe metrics and scale services according to configured rules by issuing orders to orchestration engines.
 Currently, the only supported target is the docker engine.
 
 Requirements
@@ -15,9 +15,9 @@ Try it out !
 ------------
 Clone the repository in your `$GOPATH` or anywhere else
 ```BASH
-git clone git@github.com:Zenika/zscaler.git
+git clone git@github.com:Zenika/zenscaler.git
 ```
-Run an example with træfik on Docker, pulling `zenika/zscaler` from [docker.io](https://hub.docker.com/r/zenika/zscaler/)
+Run an example with træfik on Docker, pulling `zenika/zenscaler` from [docker.io](https://hub.docker.com/r/zenika/zenscaler/)
 ```BASH
 cd ./examples/docker-compose/traefik && docker-compose up
 ```
@@ -34,7 +34,7 @@ Usage
 
 ### Configuration file
 
-Please refer to the dedicated [wiki page](https://github.com/Zenika/zscaler/wiki/Configuration#configuration-file) for details.
+Please refer to the dedicated [wiki page](https://github.com/Zenika/zenscaler/wiki/Configuration#configuration-file) for details.
 
 Use-case configuration files can be found under the `examples/` folder. Here's a sample:
 
@@ -79,7 +79,7 @@ rules:                                 # rule section
 ### Command line interface
 
 ```BASH
-$ zscaler [command]
+$ zenscaler [command]
 Available Commands:
   dumpconfig  Dump parsed config file to stdout
   start       Start autoscaler
@@ -92,7 +92,7 @@ API
 ---
 
 A REST API is available at startup, listening on `:3000` (change it with `-l` or `--api-port` flag).
-You can find examples on the [wiki page](https://github.com/Zenika/zscaler/wiki/API).
+You can find examples on the [wiki page](https://github.com/Zenika/zenscaler/wiki/API).
 
 URL                | HTTP verb | Description
 -------------------|-----------|------
@@ -109,7 +109,7 @@ Build it
 
 You'll need Go 1.5 or above. Older version _may_ work but are still untested.
 - Install Goalang and set you `$GOPATH`
-- Run `go get github.com/Zenika/zscaler` and do
+- Run `go get github.com/Zenika/zenscaler` and do
 ```BASH
 make all
 ```
@@ -121,7 +121,7 @@ If you have a docker engine, you can build zScaler inside a container and run it
 make docker # build in docker and create docker image
 ```
 
-The golang build image is tagged `zscaler-build` and the production image `zscaler`.
+The golang build image is tagged `zenscaler-build` and the production image `zenscaler`.
 
 Aside : Deploy on EC2
 -------------

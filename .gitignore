@@ -6,8 +6,9 @@
 *.key
 *.cnf
 *.crt
-zscaler
+zenscaler
 vendor/
 .glide/
 ec2.*
 *.out
+build/

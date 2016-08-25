@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Zenika/zscaler/core"
-	"github.com/Zenika/zscaler/core/types"
+	"github.com/Zenika/zenscaler/core"
+	"github.com/Zenika/zenscaler/core/types"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"

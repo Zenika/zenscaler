@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/Zenika/zscaler/core/types"
+	"github.com/Zenika/zenscaler/core/types"
 
 	log "github.com/Sirupsen/logrus"
 )

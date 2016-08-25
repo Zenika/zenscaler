@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"path"
 
-	"github.com/Zenika/zscaler/core"
-	"github.com/Zenika/zscaler/core/types"
+	"github.com/Zenika/zenscaler/core"
+	"github.com/Zenika/zenscaler/core/types"
 )
 
 // CheckTLS for missing certificate and key

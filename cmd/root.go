@@ -4,17 +4,17 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/Zenika/zscaler/core"
+	"github.com/Zenika/zenscaler/core"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 // RootCmd is the defaut command
 var RootCmd = &cobra.Command{
-	Use:   "zscaler",
+	Use:   "zenscaler",
 	Short: "ZScaler is a simple yet flexible scaler",
 	Long: `A Simple and Flexible scaler for various orchetrators.
-Complete documentation is available at https://github.com/zenika/zscaler/wiki`,
+Complete documentation is available at https://github.com/zenika/zenscaler/wiki`,
 	Run: func(cmd *cobra.Command, args []string) {
 		help := cmd.HelpFunc()
 		help(cmd, args)
@@ -40,7 +40,7 @@ var versionCmd = &cobra.Command{
 	Short: "Version number",
 	Long:  "Display version number and build informations",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("zscaler %s, build with %s\n", core.Version, core.GoVersion)
+		fmt.Printf("zenscaler %s, build with %s\n", core.Version, core.GoVersion)
 		return
 	},
 }

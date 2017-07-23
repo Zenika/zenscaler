@@ -44,7 +44,7 @@ func setConfigPath() {
 func parseConfig() (*types.Configuration, error) {
 	err := viper.ReadInConfig() // Find and read the config file
 	if err != nil {             // Handle errors reading the config file
-		return nil, fmt.Errorf("Cannot read config file: %s \n", err)
+		return nil, fmt.Errorf("cannot read config file: %s", err)
 	}
 
 	// global configuration structure
@@ -77,7 +77,7 @@ func parseConfig() (*types.Configuration, error) {
 func parseOrchestrator(config *types.Configuration) error {
 	sub := viper.Sub("orchestrator")
 	if sub == nil {
-		return fmt.Errorf("Orchestrator section missing!")
+		return fmt.Errorf("'orchestrator' section required, missing")
 	}
 	config.Orchestrator = types.OrchestratorConfig{
 		Engine:        sub.GetString("engine"),
@@ -116,7 +116,7 @@ func parseScalers(config *types.Configuration) error {
 			}
 			config.Scalers[name] = ss
 		case "":
-			return fmt.Errorf("Unknown scaler type: %s\n", s.GetString("type"))
+			return fmt.Errorf("unknown scaler type: %s", s.GetString("type"))
 		}
 	}
 	return nil

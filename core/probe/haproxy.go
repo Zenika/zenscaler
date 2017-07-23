@@ -28,7 +28,7 @@ func (ha HAproxy) Name() string {
 func (ha HAproxy) Value() (float64, error) {
 	statsMap, err := ha.getStats(ha.Type)
 	if err != nil {
-		return 0, fmt.Errorf("Cannot probe hap: %s\nCheck access rights.", err)
+		return 0, fmt.Errorf("cannot probe hap: %s, check access rights", err)
 	}
 	value, err := strconv.ParseFloat(statsMap[ha.Item][1], 64)
 	if err != nil {
@@ -84,7 +84,7 @@ func (ha *HAproxy) HaproxyCmd(cmd string) (string, error) {
 	// connect to haproxy
 	conn, errConn := net.Dial("unix", ha.Socket)
 	if errConn != nil {
-		return "", fmt.Errorf("Unable to connect to HAproxy socket: %s", errConn)
+		return "", fmt.Errorf("unable to connect to HAproxy socket: %s", errConn)
 	}
 	// #nosec close unix socket, no information written
 	defer func() { _ = conn.Close() }()

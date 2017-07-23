@@ -12,7 +12,7 @@ vendors:
 install:
 	go install --ldflags "-s -w -X github.com/Zenika/zenscaler/core.Version=`git describe --tags --dirty`" .
 linter:
-	go install . && gometalinter -j4 --deadline 300s ./...
+	go install . && gometalinter -j4 --deadline 300s --vendor	 ./...
 unit_test:
 	go test -v --cover ./api
 	go test -v --cover ./cmd

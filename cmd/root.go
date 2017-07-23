@@ -41,6 +41,5 @@ var versionCmd = &cobra.Command{
 	Long:  "Display version number and build informations",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("zenscaler %s, build with %s\n", core.Version, core.GoVersion)
-		return
 	},
 }

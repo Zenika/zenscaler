@@ -211,12 +211,18 @@ func parseProbe(config *types.Configuration, r string) (p types.Probe, err error
 	case "hap":
 		// HAproxy probes
 		p, err = parseProbeHAP(rules, r, splittedProbe)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing HAProxy probe: %s", err)
+		}
 	case "cmd":
 		p = &probe.Command{
 			Cmd: rules.Sub(r).GetString("cmd"),
 		}
 	case "prom":
 		p, err = parseProbeProm(rules, r, splittedProbe)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing prometheus probe: %s", err)
+		}
 	case "mock":
 		p = &probe.DefaultScalingProbe{}
 	default:

@@ -52,7 +52,7 @@ func HTTPSClient() (*http.Client, error) {
 	// build up https configuration
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{
-			Certificates: append(make([]tls.Certificate, 1, 1), certPair),
+			Certificates: append(make([]tls.Certificate, 1), certPair),
 			RootCAs:      caPool,
 		},
 	}
